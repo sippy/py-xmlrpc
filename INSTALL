@@ -1,0 +1,96 @@
+==================================
+Installation of the Xmlrpc library
+==================================
+
+
+Using RPM's (Redhat Linux)
+==========================
+Several different rpms (both binaries and source) are available at
+"http://www.sourcelight.com/xmlrpc".
+
+All you need to do is run (as root):
+
+rpm -i xmlrpc-0.9.....rpm	(substitute the real name of your rpm)
+
+
+Using .exe files (windows)
+==========================
+run the self installing executable available at
+"http://www.sourcelight.com/xmlrpc".
+
+
+
+Using Binaries
+===============
+Several different binaries are available for _xmlrpcmodule.so on different
+platforms at "http://www.sourcelight.com/xmlrpc".
+
+All you need to do is (on a Posix system):
+
+tar -xzvf xmlrpc-0.9.tar.gz
+cd xmlrpc-0.9
+(become root)
+cp -p xmlrpc.py _xmlrpcmodule.so /usr/lib/python1.5/site-packages/
+
+Of course, you should replace xmlrpc-0.8 with the applicable version and alter
+the path to your site-packes file as necessary.
+
+
+
+Using Source
+===============
+
+POSIX and Python 1.6/2.0 (or 1.5.2 w/ distutils):
+----------------------------------------------
+	To build xmlrpc for Python 1.6/2.0, all you need is the distutils 
+package, which comes with these versions of python, and gcc.  If you want to
+build it this way for Python 1.5.2, all you need to do is grab the distutils
+package from:
+
+http://www.python.org/sigs/distutils-sig/download.html
+
+To build, use the following commands:
+
+tar -xzvf xmlrpc-0.9.tar.gz
+cd xmlrpc-0.9
+python setup.py build
+
+
+This creates a "build" sub-directory.  In it, you will find a directory called
+"lib-<your system>".  Inside that directory, you will find _xmlrpc.so and
+xmlrpc.py.  Copy these to where you need to use them or, to install system
+wide:
+
+(become root)
+python setup.py install
+
+
+Windows and Python 1.6/2.0 (or 1.5.2 w/ distutils):
+------------------------------------------------
+	In order to build xmlrpc for windows, you must have a version of
+Visual C++ installed (v 5.0+).  You also must get the distutils package for
+Python 1.5.2 if that is what your are building it for.  Once you satisfy these
+requirements, you may build xmlrpc.
+
+
+To build, unzip that archive to a directory somewhere.  Open up a "cmd" window
+and run the following command after chaging to the directory you unzipped to:
+
+python setup.py build
+
+This creates a "build" sub-directory.  In it, you will find a directory called
+"lib-win32.2.0".  Inside that directory, you will find _xmlrpc.so and
+xmlrpc.py.  Copy these to where you need to use them or, to install system
+wide:
+
+python setup.py install
+
+
+Compiling by Hand
+-----------------
+tar -xzvf xmlrpc-0.9.tar.gz
+cd xmlrpc-0.9
+** edit the Makefile to reflect your version of python (PYTHON) **
+make clean; make
+(become root)
+make install
