@@ -105,7 +105,7 @@ rpcFault_Extract(PyObject *fault, int *faultCode, char **faultString)
 	if (faultCode && PyInt_Check(pyFaultCode))
 		*faultCode = (int)PyInt_AS_LONG(pyFaultCode);
 	else {
-		fprintf(stderr, "invalid fault code... default to -1\n");
+		fprintf(rpcLogger, "invalid fault code... default to -1\n");
 		*faultCode = -1;
 	}
 	pyFaultString = PyObject_GetAttrString(fault, "faultString");
@@ -115,7 +115,7 @@ rpcFault_Extract(PyObject *fault, int *faultCode, char **faultString)
 			return false;
 		strcpy(*faultString, PyString_AS_STRING(pyFaultString));
 	} else {
-		fprintf(stderr, "invalid fault string... default to 'unknown error'\n");
+		fprintf(rpcLogger, "invalid fault string... default to 'unknown error'\n");
 		*faultString = alloc(strlen("unknown error") + 1);
 		if (*faultString == NULL)
 			return false;
@@ -148,7 +148,7 @@ rpcFaultRaise(PyObject *errCode, PyObject *errString)
 	assert(PyString_Check(errString));
 	tuple = Py_BuildValue("(O,O)", errCode, errString);
 	if (tuple == NULL)
-		fprintf(stderr, "Py_BuildValue failed in rpcFaultRaise");
+		fprintf(rpcLogger, "Py_BuildValue failed in rpcFaultRaise");
 	PyErr_SetObject(rpcFault, tuple);
 	Py_DECREF(tuple);
 }

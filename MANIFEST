@@ -5,6 +5,7 @@
 ./README
 ./setup.py
 ./xmlrpc.py
+./pyxmlrpclib.py
 ./examples/examples.py
 ./examples/interop.py
 ./examples/validate.py

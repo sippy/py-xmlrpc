@@ -221,9 +221,9 @@ pyMarshaller(rpcDisp *dp, rpcSource *srcp, int acts, PyObject *params)
 	if (res == NULL)
 		return false;
 	unless (PyInt_Check(res)) {
-		fprintf(stderr, "callback returned ");
-		PyObject_Print(res, stderr, 0);
-		fprintf(stderr, "; removing handler\n");
+		fprintf(rpcLogger, "callback returned ");
+		PyObject_Print(res, rpcLogger, 0);
+		fprintf(rpcLogger, "; removing handler\n");
 	} else if (PyInt_AsLong(res)) {
 		srcp->params = params;
 		srcp->actImp = acts;

@@ -43,6 +43,7 @@ xmlrpcInit(void)
 		Py_Initialize();
 
 	rpcLogLevel = 3;
+	rpcLogger = stderr;
 	rpcDateFormat = XMLRPC_DATE_FORMAT_US;
 	rpcBoolType.ob_type = &PyType_Type;
 	rpcDateType.ob_type = &PyType_Type;
@@ -52,17 +53,17 @@ xmlrpcInit(void)
 	rpcSourceType.ob_type = &PyType_Type;
 	rpcError = PyString_FromString("xmlrpc.error");
 	if (rpcError == NULL) {
-		fprintf(stderr, "rpcError is NULL in xmlrpcInit\n");
+		fprintf(rpcLogger, "rpcError is NULL in xmlrpcInit\n");
 		exit(1);
 	}
 	rpcFault = rpcFaultClass();
 	if (rpcFault == NULL) {
-		fprintf(stderr, "rpcFaultStr is NULL in xmlrpcInit\n");
+		fprintf(rpcLogger, "rpcFaultStr is NULL in xmlrpcInit\n");
 		exit(1);
 	}
 	rpcPostpone = rpcPostponeClass();
 	if (rpcPostpone == NULL) {
-		fprintf(stderr, "rpcPostponeStr is NULL in xmlrpcInit\n");
+		fprintf(rpcLogger, "rpcPostponeStr is NULL in xmlrpcInit\n");
 		exit(1);
 	}
 

@@ -8,11 +8,19 @@ Public
 - created queueRequest to finish responding to a delayed request
 - create response example in examples.py
 - create response method in exampleServer in examples.py
+- added support for file logging object (thanks to Ross Brattain)
+- added buildCall, parseCall to help support pyxmlrpclib
+- added pyxmlrpclib.py for drop-in compatibility w/ xmlrpclib
 
 Internal
 --------
-Fixed signed/unsigned problem and a 64 bit problem that could lead to weird
-bugs.  Thanks to Marcin Cieslak for the patch.
+- used buffConstant for appending constant length strings in rpcUtils.c
+(thanks to Christian Gafton).  This speeds things up by 20% in many cases.
+- Fixed signed/unsigned problem and a 64 bit problem that could lead to
+weird bugs.  Thanks to Marcin Cieslak for the patch.
+- Fixed windows server typo bug that lead to "No such file or directory"
+in bindAndListen.
+- Fixed off-by-one bug in parsing entities starting with '&#'
 
 
 Version 0.8.8.2

@@ -44,10 +44,10 @@ rpcLogMsg(int level, char *formp, ...)
 			return;
 	}
 	va_start(ap, formp);
-	fprintf(stderr, "%s ", buff);
-	vfprintf(stderr, formp, ap);
-	fprintf(stderr, "\n");
-	fflush(stderr);
+	fprintf(rpcLogger, "%s ", buff);
+	vfprintf(rpcLogger, formp, ap);
+	fprintf(rpcLogger, "\n");
+	fflush(rpcLogger);
 	va_end(ap);
 }
 
@@ -74,16 +74,16 @@ rpcLogSrc(int level, rpcSource *srcp, char *formp, ...)
 	}
 	if (srcp->desc) {
 		if (srcp->fd >= 0)
-			fprintf(stderr, "%s <source %s fd %d> ",
+			fprintf(rpcLogger, "%s <source %s fd %d> ",
 				buff, srcp->desc, srcp->fd);
 		else
-			fprintf(stderr, "%s <source %s> ",
+			fprintf(rpcLogger, "%s <source %s> ",
 				buff, srcp->desc);
 	} else
-		fprintf(stderr, "%s <source fd %d> ", buff, srcp->fd);
+		fprintf(rpcLogger, "%s <source fd %d> ", buff, srcp->fd);
 	va_start(ap, formp);
-	vfprintf(stderr, formp, ap);
-	fprintf(stderr, "\n");
+	vfprintf(rpcLogger, formp, ap);
+	fprintf(rpcLogger, "\n");
 	va_end(ap);
 }
 
@@ -92,6 +92,15 @@ void
 setLogLevel(int level)
 {
 	rpcLogLevel = level;
+}
+
+void
+setLogger(FILE *logger)
+{
+	if (logger != NULL)
+		rpcLogger = logger;
+	else
+		rpcLogger = stderr; /* fallback */
 }
 
 

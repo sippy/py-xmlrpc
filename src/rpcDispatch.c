@@ -301,20 +301,20 @@ dispHandleError(rpcSource *srcp)
 		assert(PyCallable_Check(pyfunc));
 		tuple = Py_BuildValue("(O,(O,O,O))", srcp, nexc, nv, ntb);
 		if (tuple == NULL) {
-			fprintf(stderr, "BAD ERROR HANDLER ERROR!!\n");
+			fprintf(rpcLogger, "BAD ERROR HANDLER ERROR!!\n");
 			PyErr_Print();
 		} else {
 			pyres = PyObject_CallObject(pyfunc, tuple);
 			if (pyres == NULL) {
-				fprintf(stderr, "ERROR HANDLER FAILED!!\n");
+				fprintf(rpcLogger, "ERROR HANDLER FAILED!!\n");
 				PyErr_Print();
 			} else if (PyInt_Check(pyres)) {
 				res = (int)PyInt_AS_LONG(pyres);
 			} else {
-				fprintf(stderr, "Error handler returned:");
-				PyObject_Print(pyres, stderr, 0);
-				fprintf(stderr, "\n");
-				fprintf(stderr, "Defaulting to %d\n",
+				fprintf(rpcLogger, "Error handler returned:");
+				PyObject_Print(pyres, rpcLogger, 0);
+				fprintf(rpcLogger, "\n");
+				fprintf(rpcLogger, "Defaulting to %d\n",
 						ONERR_KEEP_DEF);
 			}
 			Py_DECREF(tuple);
@@ -330,10 +330,10 @@ dispHandleError(rpcSource *srcp)
 			srcp->fd = -1;
 		}
 		if (srcp->desc == NULL)
-			fprintf(stderr, "Error from source <fd %d>:\n",
+			fprintf(rpcLogger, "Error from source <fd %d>:\n",
 				srcp->fd);
 		else
-			fprintf(stderr, "Error from source <%s, fd %d>:\n",
+			fprintf(rpcLogger, "Error from source <%s, fd %d>:\n",
 				srcp->desc, srcp->fd);
 		PyErr_Restore(exc, v, tb);
 	} else if (! res & ONERR_KEEP_WORK) {
@@ -379,7 +379,7 @@ dispNextEv(rpcDisp *dp, double timeout)
 			src->actOcc |= ACT_IMMEDIATE;
 			hasImm = true;
 		} else if (src->fd < 0) {
-			fprintf(stderr, "BAD FD!!: %d\n", src->fd);
+			fprintf(rpcLogger, "BAD FD!!: %d\n", src->fd);
 			continue;
 		} else {
 			if (src->actImp & ACT_INPUT)

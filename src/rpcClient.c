@@ -764,8 +764,8 @@ readHeader(
 		*chunked = true;
 		*blen = -1;
 	} else if (lp == NULL) {
-		fprintf(stderr, "No Content-length parameter found\n");
-		fprintf(stderr, "reading to EOF...\n");
+		fprintf(rpcLogger, "No Content-length parameter found\n");
+		fprintf(rpcLogger, "reading to EOF...\n");
 		*blen = -1;
 	} else unless (decodeActLong(&lp, ep, blen)) {
 		Py_DECREF(buff);

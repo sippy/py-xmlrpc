@@ -62,8 +62,9 @@ PyObject	*rpcFaultStr;
 int		rpcLogLevel;
 void		xmlrpcInit(void);
 void		setLogLevel(int level);
+void		setLogger(FILE *logger);
 int		rpcDateFormat;
-
+FILE            *rpcLogger;
 
 #ifdef MSWINDOWS
 	void		rpcNTcleanup(void);

@@ -47,7 +47,10 @@
 #define	ushort		unsigned short
 
 
+static PyObject		*logFileObj = NULL;
+
 static PyObject		*pySetLogLevel(PyObject *self, PyObject *args);
+static PyObject		*pySetLogger(PyObject *self, PyObject *args);
 static PyObject		*getDateFormat(PyObject *self, PyObject *args);
 static PyObject		*setDateFormat(PyObject *self, PyObject *args);
 static PyObject		*makeXmlrpcBool(PyObject *self, PyObject *args);
@@ -99,6 +102,7 @@ static PyMethodDef rpcModuleMethods[] = {
 	{ "parseResponse",	(PyCFunction)rpcParseResponse,		1, },
 	/* misc functions  */
 	{ "setLogLevel",	(PyCFunction)pySetLogLevel,		1, },
+	{ "setLogger",	        (PyCFunction)pySetLogger,		1, },
 	{ "getDateFormat",	(PyCFunction)getDateFormat,		1, },
 	{ "setDateFormat",	(PyCFunction)setDateFormat,		1, },
 	{  NULL,		 NULL,					0, },
@@ -106,7 +110,7 @@ static PyMethodDef rpcModuleMethods[] = {
 
 
 /*
- * module procedure: create a boolean object
+ * module procedure: set the log level
  */
 static PyObject *
 pySetLogLevel(PyObject *self, PyObject *args)
@@ -117,6 +121,32 @@ pySetLogLevel(PyObject *self, PyObject *args)
 		return NULL;
 
 	setLogLevel(level);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+/*
+ * module procedure: set the logger file
+ */
+static PyObject *
+pySetLogger(PyObject *self, PyObject *args)
+{
+	PyObject *object = NULL;
+	FILE    *file = NULL;
+
+	unless (PyArg_ParseTuple(args, "O!", &PyFile_Type, &object))
+		return NULL;
+
+	assert(object != NULL);
+	assert(PyFile_Check(object));
+	if (logFileObj != NULL) {
+		Py_DECREF(logFileObj);
+	}
+	logFileObj = object;
+	Py_INCREF(logFileObj);
+	file = PyFile_AsFile(object);
+	setLogger(file);
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -463,7 +493,7 @@ init_xmlrpc(void) {
 	and     (insint(d, "DATE_FORMAT_EUROPE",  XMLRPC_DATE_FORMAT_EUROPE))
 	and     (insstr(d, "VERSION",             XMLRPC_VER))
 	and     (insstr(d, "LIBRARY",             XMLRPC_LIB_STR))) {
-		fprintf(stderr, "weird shit happened in module loading\n");
+		fprintf(rpcLogger, "weird shit happened in module loading\n");
 		return;
 	}
 }

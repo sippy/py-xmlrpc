@@ -341,7 +341,7 @@ serveAccept(rpcDisp *dp, rpcSource *sp, int actions, PyObject *servp)
 		PyErr_SetFromErrno(rpcError);
 		return false;
 	} else
-		fprintf(stderr, "blocked on accept\n");
+		fprintf(rpcLogger, "blocked on accept\n");
 	sp->actImp = ACT_INPUT;
 	sp->func = serveAccept;
 	sp->params = servp;
@@ -746,7 +746,7 @@ authenticate(rpcServer *servp, PyObject *addInfo)
 		cp = strchr((const char *)bp, ':');
 		if (cp == NULL) {
 			setPyErr("illegal authentication string");
-			fprintf(stderr, "illegal authentication is '%s'\n", bp);
+			fprintf(rpcLogger, "illegal authentication is '%s'\n", bp);
 			return false;
 		}
 		name = PyString_FromStringAndSize(bp, cp-bp);
@@ -765,10 +765,10 @@ authenticate(rpcServer *servp, PyObject *addInfo)
 	and     (PyTuple_GET_SIZE(res) == 2)
 	and     (PyInt_Check(PyTuple_GET_ITEM(res, 0)))
 	and     (PyString_Check(PyTuple_GET_ITEM(res, 1)))) {
-		fprintf(stderr, "authentication function returned ");
-		PyObject_Print(res, stderr, 0);
+		fprintf(rpcLogger, "authentication function returned ");
+		PyObject_Print(res, rpcLogger, 0);
 		Py_DECREF(res);
-		fprintf(stderr, "; defaulting to (0, 'unknown')\n");
+		fprintf(rpcLogger, "; defaulting to (0, 'unknown')\n");
 		setPyErr("authentication failed for domain 'unknown'");
 		return false;
 	}
