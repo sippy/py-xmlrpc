@@ -799,11 +799,11 @@ decodeString(char **cp, char *ep, ulong *lines)
 	PyObject	*res;
 	char		*tp;
 
-	if ((*cp)[7] == '/') {
+	if (strncmp(*cp, "<string/>", 9) == 0) {
 		*cp += strlen("<string/>");
 		chompStr(cp, ep, lines);
 		return PyString_FromString("");
-	} else if ((*cp)[8] == '/') {
+	} else if (strncmp(*cp, "<string />", 10) == 0) {
 		*cp += strlen("<string />");
 		chompStr(cp, ep, lines);
 		return PyString_FromString("");
