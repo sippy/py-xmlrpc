@@ -516,7 +516,9 @@ doResponse(rpcServer *servp, rpcSource *srcp, PyObject *result, bool keepAlive)
 			return (false);
 		} else if (PyErr_GivenExceptionMatches(v, rpcPostpone)) {
 			rpcLogSrc(7, srcp, "received postpone request");
+			PyErr_Restore(exc, v, tb);
 			PyErr_Clear();
+			Py_DECREF(addInfo);
 			return (true);
 		} else if (exc and grabError(&faultCode, &faultString, exc, v, tb)) {
 			response = buildFault(faultCode, faultString, addInfo);

@@ -63,7 +63,7 @@ events you received on file descriptors.  This can be very nice.  There is
 some work to be done here, but all the hooks are in place.  See TO DO for
 a list of the features that have yet to be incorporated.
 
-* Portable: Source should be compatible on both windows and POSIX
+* Portable: Source should be compatible on both windows and POSIX.
 
 * Compatiblity: pyxmlrpclib.py is a drop in replacement for xmlrpclib.
 To use it, simply change pyxmlrpclib instead of xmlrpclib.
