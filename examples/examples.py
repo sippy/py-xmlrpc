@@ -26,6 +26,7 @@ def main():
 	global TESTMAP
 
 	TESTMAP	= {
+		'ascii'		: exampleAscii,
 		'authClient'	: exampleAuthClient,
 		'amper'		: exampleAmper,
 		'activeFds'	: exampleActiveFds,
@@ -65,6 +66,10 @@ def usage():
 	sys.exit(1)
 
 
+def exampleAscii():
+	print xmlrpc.decode('<value><string>&#38;</string></value>')
+
+	
 def exampleAmper():
 	e = xmlrpc.encode('&')
 	print e

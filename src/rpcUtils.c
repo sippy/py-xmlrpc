@@ -1852,7 +1852,7 @@ unescapeString(char *bp, char *ep)
 			}
 			if ((remLen > 3)
 			and (strncmp(bp, "&#", 2) == 0)) {
-				bp += 3;
+				bp += 2;
 				if (!decodeActLong(&bp, ep, &tmp))
 					return setPyErr("Illegal quoted sequence");
 				if (*bp++ != ';')
