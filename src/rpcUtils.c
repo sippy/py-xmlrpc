@@ -567,9 +567,15 @@ decodeValue(char **cp, char *ep, ulong *lines)
 		res = decodeString(cp, ep, lines);
 	else if (strncmp(*cp, "<string/>", 9) == 0)
 		res = decodeString(cp, ep, lines);
+	else if (strncmp(*cp, "<string />", 10) == 0)
+		res = decodeString(cp, ep, lines);
 	else if (strncmp(*cp, "<array>", 7) == 0)
 		res = decodeArray(cp, ep, lines);
 	else if (strncmp(*cp, "<struct>", 8) == 0)
+		res = decodeStruct(cp, ep, lines);
+	else if (strncmp(*cp, "<struct/>", 9) == 0)
+		res = decodeStruct(cp, ep, lines);
+	else if (strncmp(*cp, "<struct />", 10) == 0)
 		res = decodeStruct(cp, ep, lines);
 	else if (strncmp(*cp, "<dateTime.iso8601>", 18) == 0)
 		res = decodeDate(cp, ep, lines);
@@ -797,6 +803,10 @@ decodeString(char **cp, char *ep, ulong *lines)
 		*cp += strlen("<string/>");
 		chompStr(cp, ep, lines);
 		return PyString_FromString("");
+	} else if ((*cp)[8] == '/') {
+		*cp += strlen("<string />");
+		chompStr(cp, ep, lines);
+		return PyString_FromString("");
 	} else
 		*cp += strlen("<string>");
 	tp = *cp;
@@ -877,6 +887,9 @@ decodeArray(char **cp, char *ep, ulong *lines)
 	} else if (strncmp("<data/>", *cp, 7) == 0) {
 		unless (findTag("<data/>", cp, ep, lines, true))
 			return NULL;
+	} else if (strncmp("<data />", *cp, 8) == 0) {
+		unless (findTag("<data />", cp, ep, lines, true))
+			return NULL;
 	}
 	unless (findTag("</array>", cp, ep, lines, true)) {
 		Py_DECREF(res);
@@ -902,6 +915,19 @@ decodeStruct(char **cp, char *ep, ulong *lines)
 	res = PyDict_New();
 	if (res == NULL)
 		return NULL;
+	if (strncmp(*cp, "<struct/>", 9) == 0) {
+		unless (findTag("<struct/>", cp, ep, lines, true)) {
+			Py_DECREF(res);
+			return NULL;
+		}
+		return res;
+	} else if (strncmp(*cp, "<struct />", 10) == 0) {
+		unless (findTag("<struct />", cp, ep, lines, true)) {
+			Py_DECREF(res);
+			return NULL;
+		}
+		return res;
+	}
 	unless (findTag("<struct>", cp, ep, lines, true)) {
 		Py_DECREF(res);
 		return NULL;
