@@ -50,13 +50,13 @@ static	bool		writeRequest(rpcClient *cp, PyObject **toWritep);
 static	bool		readResponse(
 				rpcClient	*cp,
 				PyObject	**bodyp,
-				ulong		blen
+				long		blen
 			);
 static	bool		readHeader(
 				rpcClient 	*cp,
  				PyObject	**headp,
 				PyObject	**bodyp,
-				ulong		*blen,
+				long		*blen,
 				bool		*chunked
 			);
 static	bool		nbRead(int fd, PyObject **buffpp, bool *eof);
@@ -202,7 +202,7 @@ execDispatch(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 			nacts,
 			nstate,
 			r;
-	ulong		blen;
+	long		blen;
 	bool		chunked;
 
 	nargs = NULL;				/* to appease the compiler */
@@ -300,7 +300,7 @@ execDispatch(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 		Py_DECREF(head);
 		Py_DECREF(body);
 	case STATE_READ_BODY:	/* args is (head, body, blen, chunk, chunked) */
-		unless (PyArg_ParseTuple(args, "SSiSi:execDispatchReadBody",
+		unless (PyArg_ParseTuple(args, "SSlSi:execDispatchReadBody",
 		                         &head, &body, &blen,
 		                         &chunk, &chunked)) {
 			cp->execing = false;
@@ -712,7 +712,7 @@ readHeader(
 	rpcClient	*client,
 	PyObject	**headp,
 	PyObject	**bodyp,
-	ulong		*blen,
+	long		*blen,
 	bool		*chunked
 )
 {
@@ -774,7 +774,7 @@ readHeader(
 	}
 	rpcLogSrc(9, client->src, "client finished reading header");
 	rpcLogSrc(9, client->src,
-	         "client bodylen should be %d %s chunked mode",
+	         "client bodylen should be %ld %s chunked mode",
 	         *blen, *chunked ? "in" : "not in");
 	*headp = PyString_FromStringAndSize(hp, bp-hp);
 	*bodyp = PyString_FromStringAndSize(bp, ep-bp);
@@ -793,17 +793,18 @@ readHeader(
  * appropriately.
  */
 static bool
-readResponse(rpcClient *cp, PyObject **bodyp, ulong blen)
+readResponse(rpcClient *cp, PyObject **bodyp, long blen)
 {
 	PyObject	*body;
 	bool		eof;
-	ulong		slen;
+	long		slen;
 
 	body = *bodyp;
 	unless (nbRead(cp->src->fd, &body, &eof))
 		return false;
 	slen = PyString_GET_SIZE(body);
-	rpcLogSrc(9, cp->src, "client read %d of %d bytes of body", slen, blen);
+	rpcLogSrc(9, cp->src, "client read %ld of %d bytes of lbody",
+	          slen, blen);
 	if (blen < 0) {		/* we need to read to EOF */
 		*bodyp = body;
 		if (eof)

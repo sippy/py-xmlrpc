@@ -361,7 +361,7 @@ serverReadHeader(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 			*servp;
 	bool		eof,
 			res;
-	ulong		blen;
+	long		blen;
 	char		*hp,		/* start of header */
 			*bp,		/* start of body */
 			*cp,		/* current position */
@@ -447,7 +447,7 @@ readRequest(rpcDisp *dp, rpcSource *srcp, int actions, PyObject *params)
 	bool		eof,
 			res,
 			keepAlive;
-	ulong		blen,
+	long		blen,
 			slen;
 
 	unless (PyArg_ParseTuple(params, "SSlO:readRequest",
@@ -989,7 +989,7 @@ static bool
 nbRead(int fd, PyObject **buffpp, bool *eof)
 {
 	PyObject	*buffp;
-	ulong		bytesAv,
+	long		bytesAv,
 			olen,
 			slen;
 	char		*cp;
