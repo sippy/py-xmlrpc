@@ -35,6 +35,7 @@ def main():
 		'date'		: exampleDate,
 		'encode'	: exampleEncode,
 		'fault'		: exampleFault,
+		'emptyString'	: exampleEmptyString,
 		'error'		: exampleError,
 		'nbClient'	: exampleNbClient,
 		'postpone'	: examplePostpone,
@@ -149,6 +150,11 @@ def exampleError():
 			if e[0] in (KeyboardInterrupt, SystemExit):
 				raise e[0], e[1], e[2]
 			traceback.print_exc()
+
+def exampleEmptyString():
+	s = '<value><string/></value>'
+	print xmlrpc.decode(s)[0]
+
 
 def errorHandler(src, exc):
 	sys.stderr.write('source %s got error: ' % `src`)

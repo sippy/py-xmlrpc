@@ -781,9 +781,10 @@ decodeString(char **cp, char *ep, ulong *lines)
 	PyObject	*res;
 	char		*tp;
 
-	if ((*cp)[7] == '/')
+	if ((*cp)[7] == '/') {
 		*cp += strlen("<string/>");
-	else
+		return PyString_FromString("");
+	} else
 		*cp += strlen("<string>");
 	tp = *cp;
 	while (strncmp(*cp, "</string>", 8)) {
