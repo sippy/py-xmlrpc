@@ -1134,6 +1134,8 @@ pyRpcServerQueueResponse(PyObject *self, PyObject *args)
 	servp = (rpcServer *)self;
 	unless (PyArg_ParseTuple(args, "O!O", &rpcSourceType, &srcp, &result))
 		return (NULL);
+	assert(result != NULL);
+	Py_INCREF(result);
 	if (doResponse(servp, srcp, result, true)) {
 		Py_INCREF(Py_None);
 		return (Py_None);
