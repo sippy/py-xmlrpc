@@ -20,6 +20,7 @@
 
 PyObject	*xmlEncode(PyObject *value);
 PyObject	*xmlDecode(PyObject *string);
+PyObject	*buildCall(char *method, PyObject *params);
 PyObject	*buildRequest(
 			char *url,
 			char *method,
@@ -32,6 +33,7 @@ PyObject	*buildFault(
 			PyObject *addInfo
 		);
 PyObject	*buildResponse(PyObject *result, PyObject *addInfo);
+PyObject	*parseCall(PyObject *request);
 PyObject	*parseRequest(PyObject *request);
 PyObject	*parseResponse(PyObject *request);
 bool		doKeepAlive(PyObject *header, int reqType);

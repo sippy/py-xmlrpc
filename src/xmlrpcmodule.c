@@ -62,10 +62,12 @@ static PyObject		*makeXmlrpcServer(PyObject *self, PyObject *args);
 static PyObject		*makeXmlrpcSource(PyObject *self, PyObject *args);
 static PyObject		*rpcEncode(PyObject *self, PyObject *args);
 static PyObject		*rpcDecode(PyObject *self, PyObject *args);
+static PyObject		*rpcBuildCall(PyObject *self, PyObject *args);
 static PyObject		*rpcBuildRequest(PyObject *self, PyObject *args);
 static PyObject		*rpcBuildResponse(PyObject *self, PyObject *args);
 static PyObject		*rpcBuildFault(PyObject *self, PyObject *args);
 static PyObject		*rpcParseResponse(PyObject *self, PyObject *args);
+static PyObject		*rpcParseCall(PyObject *self, PyObject *args);
 static PyObject		*rpcParseRequest(PyObject *self, PyObject *args);
 static void		*setPyErr(char *error);
 static int		insint(PyObject *d, char *name, int value);
@@ -76,20 +78,26 @@ static int		insstr(PyObject *d, char *name, char *value);
  * Module function map
  */
 static PyMethodDef rpcModuleMethods[] = {
-	{ "boolean",		(PyCFunction)makeXmlrpcBool,		1, },
-	{ "base64",		(PyCFunction)makeXmlrpcBase64,		1, },
-	{ "dateTime",		(PyCFunction)makeXmlrpcDate,		1, },
+        /* client-server */
 	{ "client",		(PyCFunction)makeXmlrpcClient,		1, },
 	{ "clientFromServer",	(PyCFunction)makeXmlrpcClientFromServe,	1, },
 	{ "server",		(PyCFunction)makeXmlrpcServer,		1, },
+	/* encoders */
+	{ "boolean",		(PyCFunction)makeXmlrpcBool,		1, },
+	{ "base64",		(PyCFunction)makeXmlrpcBase64,		1, },
+	{ "dateTime",		(PyCFunction)makeXmlrpcDate,		1, },
 	{ "source",		(PyCFunction)makeXmlrpcSource,		1, },
 	{ "encode",		(PyCFunction)rpcEncode,			1, },
-	{ "decode",		(PyCFunction)rpcDecode,			1, },
+	{ "buildCall",		(PyCFunction)rpcBuildCall,		1, },
 	{ "buildRequest",	(PyCFunction)rpcBuildRequest,		1, },
 	{ "buildResponse",	(PyCFunction)rpcBuildResponse,		1, },
 	{ "buildFault",		(PyCFunction)rpcBuildFault,		1, },
-	{ "parseResponse",	(PyCFunction)rpcParseResponse,		1, },
+	/* parsers for data */
+	{ "decode",		(PyCFunction)rpcDecode,			1, },	
+	{ "parseCall",		(PyCFunction)rpcParseCall,		1, },
 	{ "parseRequest",	(PyCFunction)rpcParseRequest,		1, },
+	{ "parseResponse",	(PyCFunction)rpcParseResponse,		1, },
+	/* misc functions  */
 	{ "setLogLevel",	(PyCFunction)pySetLogLevel,		1, },
 	{ "getDateFormat",	(PyCFunction)getDateFormat,		1, },
 	{ "setDateFormat",	(PyCFunction)setDateFormat,		1, },
@@ -302,6 +310,22 @@ rpcDecode(PyObject *self, PyObject *args)
 
 
 /*
+ * module procedure: encode a request and return the xml string
+ */
+static PyObject *
+rpcBuildCall(PyObject *self, PyObject *args)
+{
+    char 	*method;
+    PyObject	*params;
+
+    unless (PyArg_ParseTuple(args, "sO", &method, &params))
+	return NULL;	
+    unless (PySequence_Check(params))
+	return setPyErr("build request params must be a sequence");
+    return buildCall(method, params);
+}
+
+/*
  * module procedure: encode an object in xml
  */
 static PyObject *
@@ -359,6 +383,21 @@ rpcBuildFault(PyObject *self, PyObject *args)
 	return buildFault(errCode, errStr, addInfo);
 }
 
+/*
+ * module procedure: encode an object in xml
+ */
+static PyObject *
+rpcParseCall(PyObject *self, PyObject *args)
+{
+	PyObject	*request;
+
+	unless (PyArg_ParseTuple(args, "O", &request))
+	    return NULL;
+	unless (PyString_Check(request))
+	    return setPyErr("request must be a string");
+
+	return parseCall(request);
+}
 
 /*
  * module procedure: encode an object in xml

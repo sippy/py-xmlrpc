@@ -943,19 +943,15 @@ decodeStruct(char **cp, char *ep, ulong *lines)
 }
 
 
-/*
- * build a request for a remote procedure call
- */
-PyObject *
-buildRequest(char *url, char *method, PyObject *params, PyObject *addInfo)
+/* build the methodcall xmlrpc string that is used by several functions */
+static strBuff *
+xmlMethod(char *method, PyObject *params)
 {
-	PyObject	*res,
-			*elem;
-	strBuff		*header,
-			*body;
+	strBuff 	*body;
 	int		i;
 
 	assert(PySequence_Check(params));
+	assert((method != NULL));
 	body = newBuff();
 	if ((body == NULL)
 	or  (buffConstant(body, "<?xml version=\"1.0\"?>") == NULL)
@@ -971,34 +967,72 @@ buildRequest(char *url, char *method, PyObject *params, PyObject *addInfo)
 	or  (buffConstant(body, EOL) == NULL))
 		return NULL;
 	for (i = 0; i < PyObject_Length(params); ++i) {
-		elem = PySequence_GetItem(params, i);
-		if (elem == NULL)
-			return NULL;
-		if ((buffConstant(body, "\t\t<param>") == NULL)
+	    PyObject 	*elem;
+	    elem = PySequence_GetItem(params, i);
+	    if (elem == NULL)
+		return NULL;
+	    if ((buffConstant(body, "\t\t<param>") == NULL)
 		or  (buffConstant(body, EOL) == NULL)
 		or  (buffRepeat(body, '\t', 3) == NULL)
 		or  (encodeValue(body, elem, 3) == NULL)
 		or  (buffConstant(body, EOL) == NULL)
 		or  (buffConstant(body, "\t\t</param>") == NULL)
 		or  (buffConstant(body, EOL) == NULL))
-			return NULL;
-		Py_DECREF(elem);
+		return NULL;
+	    Py_DECREF(elem);
 	}
 	if ((buffConstant(body, "\t</params>") == NULL)
 	or  (buffConstant(body, EOL) == NULL))
 		return NULL;
 	if (buffConstant(body, "</methodCall>") == NULL)
 		return NULL;
+	return body;
+	
+}
 
-	header = buildHeader(TYPE_REQ, url, addInfo, body->len);
-	if ((header == NULL)
-	or  (buffAppend(header, body->beg, body->len) == NULL))
-		return NULL;
-	res = PyString_FromStringAndSize(header->beg, header->len);
-	freeBuff(header);
-	freeBuff(body);
 
-	return res;
+/*
+ * build the xmlrpc method call for the remote procedure call
+ */
+PyObject *
+buildCall(char *method, PyObject *params)
+{
+    strBuff 	*body;
+    PyObject	*res;
+    
+    body = xmlMethod(method, params);
+    if (body == NULL)
+	return NULL;
+    res = PyString_FromStringAndSize(body->beg, body->len);
+    freeBuff(body);
+
+    return res;
+}    
+	
+
+/*
+ * build a request for a remote procedure call
+ */
+PyObject *
+buildRequest(char *url, char *method, PyObject *params, PyObject *addInfo)
+{
+    PyObject	*res;
+    strBuff 	*header,
+		*body;
+
+    body = xmlMethod(method, params);
+    if (body == NULL)
+	return NULL;
+    
+    header = buildHeader(TYPE_REQ, url, addInfo, body->len);
+    if ((header == NULL)
+	or (buffAppend(header, body->beg, body->len) == NULL))
+	return NULL;
+    res = PyString_FromStringAndSize(header->beg, header->len);
+    freeBuff(header);
+    freeBuff(body);
+
+    return res;
 }
 
 
@@ -1157,6 +1191,76 @@ buildHeader(int reqType, char *url, PyObject *addInfo, long bodyLen)
 }
 
 
+/* parse the xmlrpc call without the header section */
+PyObject *
+parseCall(PyObject *request)
+{
+	PyObject	*method,
+			*params,
+			*tuple;
+	ulong		lines;
+	char		*cp,
+			*ep,
+			*tp;
+
+	unless (PyString_Check(request))
+	    return NULL;
+	
+	lines = 1;
+	cp = PyString_AS_STRING(request);
+	ep = cp + PyObject_Length(request);
+	unless ((findXmlVersion(&cp, ep, &lines))
+	and     (findTag("<methodCall>", &cp, ep, &lines, true))
+	and     (findTag("<methodName>", &cp, ep, &lines, false)))
+		return NULL;
+	tp = cp;
+	for (; cp < ep; ++cp)
+		if (*cp == '\n')
+			lines++;
+		else if (strncmp("</methodName>", cp, 13) == 0)
+			break;
+	if (cp >= ep)
+		return eosErr();
+	method = PyString_FromStringAndSize(tp, cp - tp);
+	if (method == NULL)
+		return NULL;
+	unless (findTag("</methodName>", &cp, ep, &lines, true)) {
+		Py_DECREF(method);
+		return NULL;
+	}
+	params = PyList_New(0);
+	if (params == NULL) {
+		Py_DECREF(method);
+		return NULL;
+	}
+	if ((strncmp("<params>", cp, 8) == 0)
+	and (not parseParams(&cp, ep, &lines, params))) {
+		Py_DECREF(method);
+		Py_DECREF(params);
+		return NULL;
+	}
+	unless (findTag("</methodCall>", &cp, ep, &lines, false)) {
+		Py_DECREF(method);
+		Py_DECREF(params);
+		return NULL;
+	}
+	chompStr(&cp, ep, &lines);
+	if (cp != ep) {
+		Py_DECREF(method);
+		Py_DECREF(params);
+		return setPyErr("unused data when parsing request");
+	}
+
+	tuple = Py_BuildValue("(O, O)", method, params);
+	Py_DECREF(method);
+	Py_DECREF(params);
+
+	return tuple;
+}
+
+/* Parse an incoming request with the header. The heavy lifting is done
+ * by parseCall()
+ */
 PyObject *
 parseRequest(PyObject *request)
 {
@@ -1165,9 +1269,8 @@ parseRequest(PyObject *request)
 			*params,
 			*tuple;
 	ulong		lines;
-	char		*cp,
-			*ep,
-			*tp;
+	char		*cp, *ep;
+			
 
 	lines = 1;
 	cp = PyString_AS_STRING(request);
@@ -1175,59 +1278,34 @@ parseRequest(PyObject *request)
 	addInfo = parseHeader(&cp, ep, &lines, TYPE_REQ);
 	if (addInfo == NULL)
 		return NULL;
-	unless ((findXmlVersion(&cp, ep, &lines))
-	and     (findTag("<methodCall>", &cp, ep, &lines, true))
-	and     (findTag("<methodName>", &cp, ep, &lines, false))) {
-		Py_DECREF(addInfo);
-		return NULL;
-	}
-	tp = cp;
-	for (; cp < ep; ++cp)
-		if (*cp == '\n')
-			lines++;
-		else if (strncmp("</methodName>", cp, 13) == 0)
-			break;
-	if (cp >= ep) {
-		Py_DECREF(addInfo);
-		return eosErr();
-	}
-	method = PyString_FromStringAndSize(tp, cp - tp);
+	/* prepare a string object to call parseCall() */
+	method = PyString_FromStringAndSize(cp, ep - cp);
 	if (method == NULL) {
-		Py_DECREF(addInfo);
-		return NULL;
+	    Py_DECREF(addInfo);
+	    return NULL;
 	}
-	unless (findTag("</methodName>", &cp, ep, &lines, true)) {
-		Py_DECREF(method);
-		Py_DECREF(addInfo);
-		return NULL;
+	tuple = parseCall(method);
+	if ( (tuple == NULL) or
+	     !PySequence_Check(tuple) or
+	     (PyObject_Length(tuple) != 2) ) {
+	    Py_DECREF(method);
+	    Py_DECREF(addInfo);
+	    return NULL;
 	}
-	params = PyList_New(0);
-	if (params == NULL) {
-		Py_DECREF(method);
-		Py_DECREF(addInfo);
-		return NULL;
+	/* go the tuple back, piece it together */
+	Py_DECREF(method);	/* no longer needed */
+	
+	/* decode the tuple */
+	method = PySequence_GetItem(tuple, 0);
+	params = PySequence_GetItem(tuple, 1);
+	if ((method == NULL) or (params == NULL)) {
+	    Py_DECREF(addInfo);
+	    Py_DECREF(tuple);
+	    Py_XDECREF(method);
+	    Py_XDECREF(params);
+	    return NULL;
 	}
-	if ((strncmp("<params>", cp, 8) == 0)
-	and (not parseParams(&cp, ep, &lines, params))) {
-		Py_DECREF(method);
-		Py_DECREF(addInfo);
-		Py_DECREF(params);
-		return NULL;
-	}
-	unless (findTag("</methodCall>", &cp, ep, &lines, false)) {
-		Py_DECREF(method);
-		Py_DECREF(addInfo);
-		Py_DECREF(params);
-		return NULL;
-	}
-	chompStr(&cp, ep, &lines);
-	if (cp != ep) {
-		Py_DECREF(method);
-		Py_DECREF(addInfo);
-		Py_DECREF(params);
-		return setPyErr("unused data when parsing request");
-	}
-
+	Py_DECREF(tuple);	/* this older tuple is no longer required */
 	tuple = Py_BuildValue("(O, O, O)", method, params, addInfo);
 	Py_DECREF(method);
 	Py_DECREF(params);
