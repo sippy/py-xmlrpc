@@ -1,3 +1,15 @@
+Version 0.8.8.3
+=============
+Public
+--------
+- improved documentation in xmlrpc.py for xmlrpc.server class
+- created xmlrpc.postpone error allowing for delayed responses
+- created queueResponse to finish responding to a delayed response
+- created queueRequest to finish responding to a delayed request
+- create response example in examples.py
+- create response method in exampleServer in examples.py
+
+
 Version 0.8.8.2
 =============
 Internal

@@ -51,6 +51,7 @@
 #include "rpcDispatch.h"
 #include "rpcFault.h"
 #include "rpcInclude.h"
+#include "rpcPostpone.h"
 #include "rpcServer.h"
 #include "rpcSource.h"
 #include "rpcUtils.h"

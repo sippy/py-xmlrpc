@@ -29,7 +29,8 @@ INSTALL_PY	= install -m 644
 
 # which files we compile
 SOURCES		= xmlrpcmodule xmlrpc rpcBase64 rpcBoolean rpcClient rpcDate \
-		  rpcDispatch rpcInternal rpcServer rpcSource rpcUtils rpcFault
+		  rpcDispatch rpcInternal rpcServer rpcSource rpcUtils rpcFault \
+		  rpcPostpone
 OBJECTS		= $(addprefix $(SRC)/,$(addsuffix .o,$(SOURCES)))
 
 MODULE		= $(LIB)/_xmlrpcmodule.so

@@ -59,7 +59,9 @@ DATE_FORMAT_EUROPE	= _xmlrpc.DATE_FORMAT_EUROPE
 #		Each function must take 4 args (serv, src, uri, method, params)
 #		and return the value to be returned to the client.  If an error
 #		is raised, a fault response is created, and the client will (in
-#		this client implementation) raise the same error
+#		this client implementation) raise the same error.  Note that the
+#		the server can delay responding until a later time by raising
+#		a xmlrpc.postpone error.  See queueResponse and queueFault.
 #
 # activeFds():
 #		Returns a 3-tuple of the active file descriptor sets for
@@ -86,6 +88,32 @@ DATE_FORMAT_EUROPE	= _xmlrpc.DATE_FORMAT_EUROPE
 #		You should set an error handler using server.setOnErr() if
 #		this is not your desired behavior
 #
+# setFdAndListen(port, queue=5):
+#		The same as bindAndListen, but uses a supplied socket fd.
+#		Useful mainly for inetd servers inheriting a socket through
+#		stdin.
+#
+# setAuth(authFunc):
+#		Set a handler used for basic authentication.  The handler
+#		will get three arguments: (uri, name, password) and return
+#		a two-tuple of a 1 or 0 (1 indicating success) and the
+#		domain the authentication should apply to.  Note that the
+#		domain is not currently used.
+#
+# addSource(src):
+#		Monitor a source into the server's file descriptor event loop.
+#
+# delSource(src):
+#		Remove a source from the server's file descriptor event loop.
+#
+# queueResponse(src, result):
+#		This function is only useful if the response has been delayed
+#		by raising a xmlrpc.postpone exception.  This function will
+#		complete the response to the given client (source).
+#
+# queueFault(src, faultCode, faultString):
+#		Same as queueResponse but raises a fault.
+#
 class server:
 	def __init__(self):
 		self._o = _xmlrpc.server()
@@ -98,8 +126,8 @@ class server:
 			self.comtab[name] = func
 		self._o.addMethods(d)
 
-	def dispatch(self, servp, srcp, uri, method, params):
-		return self.comtab[method](self, srcp, uri, method, params)
+	def dispatch(self, serv, src, uri, method, params):
+		return self.comtab[method](self, src, uri, method, params)
 
 	def bindAndListen(self, port, queue=5):
 		self._o.bindAndListen(port, queue)
@@ -131,6 +159,11 @@ class server:
 	def delSource(self, src):
 		self._o.delSource(src._o)
 
+	def queueResponse(self, src, response):
+		self._o.queueResponse(src, response)
+
+	def queueFault(self, src, faultCode, faultString):
+		self._o.queueFault(src, faultCode, faultString)
 
 # An xmlrpc client class
 #
@@ -268,6 +301,12 @@ base64Type = type(base64(''))
 # fault data type
 #
 fault = _xmlrpc.fault
+
+
+# A postpone error can be raised by a server's handler function to notify
+# the client that a response will be returned LATER
+#
+postpone = _xmlrpc.postpone
 
 
 # xml encode an xmlrpc data value

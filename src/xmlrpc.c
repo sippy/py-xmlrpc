@@ -60,6 +60,12 @@ xmlrpcInit(void)
 		fprintf(stderr, "rpcFaultStr is NULL in xmlrpcInit\n");
 		exit(1);
 	}
+	rpcPostpone = rpcPostponeClass();
+	if (rpcPostpone == NULL) {
+		fprintf(stderr, "rpcPostponeStr is NULL in xmlrpcInit\n");
+		exit(1);
+	}
+
 }
 
 

@@ -52,7 +52,8 @@ static	bool		writeResponse(
 static	bool		doResponse(
 				rpcServer	*servp,
 				rpcSource	*srcp,
-				PyObject	*request
+				PyObject	*result,
+				bool		keepAlive
 			);
 static	PyObject	*dispatch(
 				rpcServer	*servp,
@@ -67,20 +68,22 @@ static	bool		grabError(
 				PyObject	*v,
 				PyObject	*tb
 			);
-static	bool		authenticate(rpcServer *servp, PyObject *addInfo);
-static	PyObject	*pyRpcServerAddMethods(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerBindAndListen(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerSetFdAndListen(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerWork(PyObject *self, PyObject *args);
 static	PyObject	*pyRpcServerActiveFds(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerClose(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerSetOnErr(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerExit(PyObject *self, PyObject *args);
-static	PyObject	*pyRpcServerSetAuth(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerAddMethods(PyObject *self, PyObject *args);
 static	PyObject	*pyRpcServerAddSource(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerBindAndListen(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerClose(PyObject *self, PyObject *args);
 static	PyObject	*pyRpcServerDelSource(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerExit(PyObject *self, PyObject *args);
 static	PyObject	*pyRpcServerGetAttr(rpcServer *sp, char *name);
+static	PyObject	*pyRpcServerQueueResponse(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerQueueFault(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerSetAuth(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerSetFdAndListen(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerSetOnErr(PyObject *self, PyObject *args);
+static	PyObject	*pyRpcServerWork(PyObject *self, PyObject *args);
 static	bool		nbRead(int fd, PyObject **buffpp, bool *eof);
+static	bool		authenticate(rpcServer *servp, PyObject *addInfo);
 
 
 rpcServer *
@@ -435,34 +438,37 @@ serverReadHeader(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 
 
 static bool
-readRequest(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
+readRequest(rpcDisp *dp, rpcSource *srcp, int actions, PyObject *params)
 {
 	PyObject	*head,
 			*body,
-			*servp;
+			*servp,
+			*result;
 	bool		eof,
-			res;
+			res,
+			keepAlive;
 	ulong		blen,
 			slen;
 
 	unless (PyArg_ParseTuple(params, "SSlO:readRequest",
 					&head, &body, &blen, &servp))
 		return false;
-	unless (nbRead(sp->fd, &body, &eof))
+	unless (nbRead(srcp->fd, &body, &eof))
 		return false;
 	slen = PyString_GET_SIZE(body);
-	rpcLogSrc(9, sp, "server read %d of %d body bytes", slen, blen);
+	rpcLogSrc(9, srcp, "server read %d of %d body bytes", slen, blen);
 	if (slen > blen) {
 		Py_DECREF(body);
 		PyErr_SetString(rpcError, "readRequest read too many bytes");
 		return false;
 	} else if (blen == slen) {
-		rpcLogSrc(9, sp, "server finished reading body");
+		rpcLogSrc(9, srcp, "server finished reading body");
 		Py_INCREF(head);	/* hack so concat doesn't fail */
 		PyString_ConcatAndDel(&head, body);
 		if (head == NULL)
 			return false;
-		res = doResponse((rpcServer *)servp, sp, head);
+		result = dispatch((rpcServer *)servp, srcp, head, &keepAlive);
+		res = doResponse((rpcServer *)servp, srcp, result, keepAlive);
 		Py_DECREF(head);
 		return res;
 	} else {
@@ -471,14 +477,14 @@ readRequest(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 			PyErr_SetString(rpcError, "got EOS while reading body");
 			return false;
 		}
-		sp->actImp = ACT_INPUT;
-		sp->func = readRequest;
-		sp->params = Py_BuildValue("(S,S,l,O)",
+		srcp->actImp = ACT_INPUT;
+		srcp->func = readRequest;
+		srcp->params = Py_BuildValue("(S,S,l,O)",
 				head, body, blen, servp);
 		Py_DECREF(body);
-		if (sp->params == NULL)
+		if (srcp->params == NULL)
 			return false;
-		unless (rpcDispAddSource(dp, sp))
+		unless (rpcDispAddSource(dp, srcp))
 			return false;
 		return true;
 	}
@@ -486,11 +492,10 @@ readRequest(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 
 
 static bool
-doResponse(rpcServer *servp, rpcSource *srcp, PyObject *request)
+doResponse(rpcServer *servp, rpcSource *srcp, PyObject *result, bool keepAlive)
 {
 	PyObject	*addInfo,
 			*response,
-			*result,
 			*strRes,
 			*params,
 			*exc,
@@ -498,24 +503,27 @@ doResponse(rpcServer *servp, rpcSource *srcp, PyObject *request)
 			*tb;
 	int		faultCode;
 	char		*faultString;
-	bool		res,
-			keepAlive;
+	bool		res;
 
 	addInfo = PyDict_New();
 	if (addInfo == NULL)
 		return false;
-	result = dispatch(servp, srcp, request, &keepAlive);
 	response = NULL;
 	if (result == NULL) {
 		PyErr_Fetch(&exc, &v, &tb);
 		PyErr_NormalizeException(&exc, &v, &tb);
-		if (exc == NULL)
+		if (exc == NULL) {
 			return (false);
-		if (exc and grabError(&faultCode, &faultString, exc, v, tb)) {
+		} else if (PyErr_GivenExceptionMatches(v, rpcPostpone)) {
+			rpcLogSrc(7, srcp, "received postpone request");
+			PyErr_Clear();
+			return (true);
+		} else if (exc and grabError(&faultCode, &faultString, exc, v, tb)) {
 			response = buildFault(faultCode, faultString, addInfo);
 			free(faultString);
-		} else
+		} else {
 			response = buildFault(-1, "Unknown error", addInfo);
+		}
 		PyErr_Restore(exc, v, tb);
 		assert(PyErr_Occurred());
 		PyErr_Print();
@@ -547,7 +555,6 @@ doResponse(rpcServer *servp, rpcSource *srcp, PyObject *request)
 
 	return res;
 }
-
 
 static PyObject *
 dispatch(rpcServer *servp, rpcSource *srcp, PyObject *request, bool *keepAlive)
@@ -1115,6 +1122,46 @@ pyRpcServerDelSource(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *
+pyRpcServerQueueResponse(PyObject *self, PyObject *args)
+{
+	rpcServer	*servp;
+	rpcSource	*srcp;
+	PyObject	*result;
+
+	servp = (rpcServer *)self;
+	unless (PyArg_ParseTuple(args, "O!O", &rpcSourceType, &srcp, &result))
+		return (NULL);
+	if (doResponse(servp, srcp, result, true)) {
+		Py_INCREF(Py_None);
+		return (Py_None);
+	} else
+		return (NULL);
+}
+
+
+static PyObject *
+pyRpcServerQueueFault(PyObject *self, PyObject *args)
+{
+	rpcServer	*servp;
+	rpcSource	*srcp;
+	PyObject	*faultCode,
+			*faultString;
+
+	servp = (rpcServer *)self;
+	unless (PyArg_ParseTuple(args, "O!OS", &rpcSourceType, &srcp,
+	                         &faultCode, &faultString))
+		return (NULL);
+	unless (PyInt_Check(faultCode)) {
+		PyErr_SetString(rpcError, "errorCode must be an integer");
+		return NULL;
+	}
+	rpcFaultRaise(faultCode, faultString);
+	Py_INCREF(Py_None);
+	return (Py_None);
+}
+
+
 /*
  * member functions for server object
  */
@@ -1130,6 +1177,8 @@ static PyMethodDef pyRpcServerMethods[] = {
 	{ "delSource",	    (PyCFunction)pyRpcServerDelSource,      1, 0 },
 	{ "setAuth",        (PyCFunction)pyRpcServerSetAuth,        1, 0 },
 	{ "setOnErr",       (PyCFunction)pyRpcServerSetOnErr,       1, 0 },
+	{ "queueFault",     (PyCFunction)pyRpcServerQueueFault,     1, 0 },
+	{ "queueResponse",  (PyCFunction)pyRpcServerQueueResponse,  1, 0 },
 	{ NULL,		NULL},
 };
 

@@ -6,7 +6,7 @@
 
 
 import sys
-sys.path.append('../')
+sys.path.insert(0, '../')
 import xmlrpc
 import traceback
 import select
@@ -18,6 +18,8 @@ TIMEOUT		= 1.0
 LOGLEVEL	= 3		# this is the default log level
 TEST_NAME	= 'shilad'
 TEST_PASS	= 'shilad'
+
+postponed	= []		# postponed requests
 
 
 def main():
@@ -35,6 +37,7 @@ def main():
 		'fault'		: exampleFault,
 		'error'		: exampleError,
 		'nbClient'	: exampleNbClient,
+		'postpone'	: examplePostpone,
 		'server'	: exampleServer
 	}
 
@@ -63,6 +66,15 @@ def usage():
 def exampleClient():
 	c = xmlrpc.client('localhost', PORT, '/blah')
 	print c.execute('echo', ['Hello, World!'])
+
+
+# all of the "magic" is actually in the "postponeMethod" handler function
+# defined later.  Basically the idea is that we can "postpone" a response.
+#
+def examplePostpone():
+	c = xmlrpc.client('localhost', PORT, '/blah')
+	print c.execute('postpone', ['Hello, World!'])
+
 
 
 # shows how to explicitly catch a xmlrpc fault raised by the server
@@ -97,7 +109,8 @@ def exampleServer():
 	s.addMethods({
 		'echo' : echoMethod,
 		'exit' : exitMethod,
-		'fault' : faultMethod
+		'fault' : faultMethod,
+		'postpone' : postponeMethod
 	})
 	s.bindAndListen(PORT)
 	while 1:
@@ -147,19 +160,42 @@ def errorHandler(src, exc):
 	# return xmlrpc.ONERR_KEEP_WORK | xmlrpc.ONERR_KEEP_DEF
 
 
-def faultMethod(servp, srcp, uri, method, params):
+def faultMethod(serv, src, uri, method, params):
 	raise xmlrpc.fault, (23, 'blah')
 
 
-def echoMethod(servp, srcp, uri, method, params):
+def echoMethod(serv, src, uri, method, params):
 	print 'params are', params
 	return params
 
 
-def exitMethod(servp, srcp, uri, method, params):
+# This is a little bit tricky.
+#
+# If we DON'T want to return right away, we can store the src object and
+# raise an xmlrpc.postpone exception (this is not really an error).
+#
+# Whenever we are ready, we can call the server method queueResponse()
+# with the source we stashed away and the result as arguments. 
+#
+# Note that there is a queueFault which behaves identically.
+#
+# This essentially echoes the following command's params to a client
+#
+def postponeMethod(serv, src, uri, method, params):
+	print 'delaying response to %s until postpone called again.' % src
+	if postponed:
+		s = postponed[0]
+		print 'queueing delayed response to %s.' % s
+		del(postponed[0])
+		serv.queueResponse(s, params)
+	postponed.append(src)
+	raise xmlrpc.postpone
+
+
+def exitMethod(serv, src, uri, method, params):
 	global exitFlag
 	exitFlag = 1
-	servp.exit()
+	serv.exit()
 	return 'okay'
 
 

@@ -448,6 +448,7 @@ init_xmlrpc(void) {
 	d = PyModule_GetDict(m);
 	PyDict_SetItemString(d, "error", rpcError);
 	PyDict_SetItemString(d, "fault", rpcFault);
+	PyDict_SetItemString(d, "postpone", rpcPostpone);
 
 	unless ((insint(d, "ACT_INPUT",           ACT_INPUT))
 	and     (insint(d, "ACT_OUTPUT",          ACT_OUTPUT))
