@@ -32,6 +32,8 @@
 ./src/rpcInclude.h
 ./src/rpcInternal.c
 ./src/rpcInternal.h
+./src/rpcPostpone.c
+./src/rpcPostpone.h
 ./src/rpcServer.c
 ./src/rpcServer.h
 ./src/rpcSource.c
