@@ -1,0 +1,66 @@
+XML-RPC Client/Server Example.
+
+	This example shows how easy xmlrpc makes it to write network applications.
+It is fairly straight-forward, easy to use, and very useful.  These classes
+(baseServer, baseControl, baseClient) allow virtually any class to be used over the
+network.  A more complete description is given in each file, but here's an overview:
+
+baseControl.py:	
+	Contains the class baseControl, which is a parent class that should be
+	inherited by the class(es) that want to provide funtionality to the server.
+
+baseServer.py:
+	Contains the class baseServer, which is the actual server in this example.
+	Contol classes (that inherit baseControl) are linked into the server object
+	to provide functionality.
+
+baseClient.py:
+	Containts the class Client, which is used to connect to the server and
+	execute commands.  It need not be inherited, but can be to extend
+	functionality.
+
+exControl.py:
+	An example Control class.
+
+exserver.py:
+	An example server which uses exControl for its functionality.
+
+exclient.py:
+	A small script which demos the functionality of exserver.
+
+
+
+Using the example:
+
+open two windows
+in one, run:
+
+./exserver -p 44444		# 44444 can be any port
+
+
+in the other, run:
+
+./exclient `hostname` 44444	# 44444 is the same are the port above
+
+
+Thats it.  It executes a few commands on the server and displays the results.
+Now you can easily write your own client/server apps.
+
+Details
+
+One point I'm glossing over is how the Client know what commands the server has.
+Well, it asks the server after connecting and the server gives it a list of commands
+that it supports.  Then the client overrides the __getattr__ function so you can
+use the commands like client.echo, instead of having to do
+client.execute('echo', ...).  It makes it more rpc-like.
+
+This obviously provides no local arg checking... if you want to do that, write a
+class that inherits from baseClient and define wrappers there.
+
+
+Chris Jensen
+
+chris@sourcelight.com
+
+BTW - email me, not shilad@sourcelight.com (the primary py-xmlrpc author), if you
+have questions/comments/etc. about this example.
