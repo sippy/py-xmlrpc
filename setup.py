@@ -28,7 +28,7 @@ setup(	name		= 'py-xmlrpc',
 	author_email	= 'shilad.sen@sourcelight.com',
 	license		= 'GNU Lesser General Public License',
 	url		= "http://sourceforge.net/projects/py-xmlrpc/",
-	py_modules	= ['xmlrpc'],
+	py_modules	= ['xmlrpc', 'pyxmlrpclib'],
 	ext_modules	= [Extension(
 				'_xmlrpc',
 				SRC,
