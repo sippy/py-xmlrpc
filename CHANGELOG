@@ -11,6 +11,8 @@ Public
 - added support for file logging object (thanks to Ross Brattain)
 - added buildCall, parseCall to help support pyxmlrpclib
 - added pyxmlrpclib.py for drop-in compatibility w/ xmlrpclib
+- added value attribute for DateTime object (6-tuple, not a string)
+- added data attribute for Base64 object
 
 Internal
 --------

@@ -9,10 +9,11 @@
 #include "rpcInternal.h"
 
 
-static void		xmlrpcDateDealloc(rpcDate *bp);
-static PyObject		*xmlrpcDateRepr(rpcDate *bp);
-static PyObject		*xmlrpcDateStr(rpcDate *bp);
-PyObject		*xmlrpcDateGetAttr(rpcDate *bp, char *name);
+static void		xmlrpcDateDealloc(rpcDate *dp);
+static PyObject		*xmlrpcDateRepr(rpcDate *dp);
+static PyObject		*xmlrpcDateStr(rpcDate *dp);
+PyObject		*xmlrpcDateGetAttr(rpcDate *dp, char *name);
+static	int		xmlrpcDateSetAttr(rpcDate *dp, char *name, PyObject *value);
 static PyObject		*xmlrpcDateGet(PyObject *self, PyObject *args);
 
 
@@ -28,7 +29,7 @@ PyTypeObject rpcDateType = {
 	(destructor)xmlrpcDateDealloc,
 	0,
 	(getattrfunc)xmlrpcDateGetAttr,
-	0,
+	(setattrfunc)xmlrpcDateSetAttr,
 	0,
 	(reprfunc)xmlrpcDateRepr,
 	0,
@@ -69,12 +70,12 @@ rpcDateNew(PyObject *tuple)
 */
 
 static void
-xmlrpcDateDealloc(rpcDate *bp)
+xmlrpcDateDealloc(rpcDate *dp)
 {
-	if (bp->value) {
-		Py_DECREF(bp->value);
+	if (dp->value) {
+		Py_DECREF(dp->value);
 	}
-	PyMem_DEL(bp);
+	PyMem_DEL(dp);
 }
 
 
@@ -82,7 +83,7 @@ xmlrpcDateDealloc(rpcDate *bp)
  * convert a date object to a string
  */
 static PyObject *
-xmlrpcDateStr(rpcDate *bp)
+xmlrpcDateStr(rpcDate *dp)
 {
 	return PyString_FromString("<dateTime.iso8601 object>");
 }
@@ -92,19 +93,19 @@ xmlrpcDateStr(rpcDate *bp)
  * represent a date object
  */
 static PyObject *
-xmlrpcDateRepr(rpcDate *bp)
+xmlrpcDateRepr(rpcDate *dp)
 {
 	char	buff[256];
 
-	assert(PyTuple_Check(bp->value));
-	assert(PyTuple_GET_SIZE(bp->value) == 6);
+	assert(PyTuple_Check(dp->value));
+	assert(PyTuple_GET_SIZE(dp->value) == 6);
 	snprintf(buff, sizeof(buff)-1, "dateTime(%ld,%ld,%ld,%ld,%ld,%ld)",
-		PyInt_AS_LONG(PyTuple_GET_ITEM(bp->value, 0)),
-		PyInt_AS_LONG(PyTuple_GET_ITEM(bp->value, 1)),
-		PyInt_AS_LONG(PyTuple_GET_ITEM(bp->value, 2)),
-		PyInt_AS_LONG(PyTuple_GET_ITEM(bp->value, 3)),
-		PyInt_AS_LONG(PyTuple_GET_ITEM(bp->value, 4)),
-		PyInt_AS_LONG(PyTuple_GET_ITEM(bp->value, 5)));
+		PyInt_AS_LONG(PyTuple_GET_ITEM(dp->value, 0)),
+		PyInt_AS_LONG(PyTuple_GET_ITEM(dp->value, 1)),
+		PyInt_AS_LONG(PyTuple_GET_ITEM(dp->value, 2)),
+		PyInt_AS_LONG(PyTuple_GET_ITEM(dp->value, 3)),
+		PyInt_AS_LONG(PyTuple_GET_ITEM(dp->value, 4)),
+		PyInt_AS_LONG(PyTuple_GET_ITEM(dp->value, 5)));
 	buff[sizeof(buff)-1] = EOS;		/* just to be safe */
 	return (PyString_FromString(buff));
 }
@@ -118,6 +119,7 @@ static PyMethodDef xmlrpcDateMethods[] = {
 };
 
 
+
 static PyObject *
 xmlrpcDateGet(PyObject *self, PyObject *args)
 {
@@ -129,7 +131,22 @@ xmlrpcDateGet(PyObject *self, PyObject *args)
 
 
 PyObject *
-xmlrpcDateGetAttr(rpcDate *bp, char *name)
+xmlrpcDateGetAttr(rpcDate *dp, char *name)
 {
-	return (Py_FindMethod(xmlrpcDateMethods, (PyObject *)bp, name));
+	assert(dp != NULL);
+	assert(name != NULL);
+	if (strcmp("value", name) == 0) {
+		Py_INCREF(dp->value);
+		return dp->value;
+	}
+	return (Py_FindMethod(xmlrpcDateMethods, (PyObject *)dp, name));
+}
+	
+static	int
+xmlrpcDateSetAttr(rpcDate *dp, char *name, PyObject *value)
+{
+	assert(dp != NULL);
+	assert(name != NULL);
+	PyErr_SetString(PyExc_AttributeError, "unknown attribute");
+	return -1;
 }

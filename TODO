@@ -1,0 +1,4 @@
+xmlrpclib:
+
+encode/decode for boolean, base64, datetime
+make value attribute for datetime a string like xmlrpclib

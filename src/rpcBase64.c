@@ -8,10 +8,15 @@
 #include "xmlrpc.h"
 #include "rpcInternal.h"
 
-
 static  void            rpcBase64Dealloc(rpcBase64 *bp);
 static  PyObject        *rpcBase64Repr(rpcBase64 *bp);
 static  PyObject        *rpcBase64Str(rpcBase64 *bp);
+static	PyObject	*rpcBase64GetAttr(rpcBase64 *bp, char *name);
+static	int		rpcBase64SetAttr(
+				rpcBase64 *bp,
+				char *name,
+				PyObject *pyval
+			);
 
 
 
@@ -272,6 +277,47 @@ rpcBase64Repr(rpcBase64 *bp)
 }
 
 
+static PyMethodDef rpcBase64Methods[] = {
+	{ NULL, NULL },
+};
+
+
+static	PyObject
+*rpcBase64GetAttr(rpcBase64 *bp, char *name)
+{
+	assert(bp != NULL);
+	assert(name != NULL);
+	if (strcmp("data", name) == 0) {
+		Py_INCREF(bp->value);
+		return bp->value;
+	}
+	return Py_FindMethod(rpcBase64Methods, (PyObject *)bp, name);
+}
+
+
+static	int
+rpcBase64SetAttr(rpcBase64 *bp, char *name, PyObject *value)
+{
+	assert(bp != NULL);
+	assert(name != NULL);
+	if (strcmp("data", name) == 0) {
+		unless (PyString_Check(value)) {
+			PyErr_SetString(PyExc_TypeError, "data must be string");
+			return -1;
+		}
+		if (bp->value) {
+			Py_DECREF(bp->value);
+		}
+		Py_INCREF(bp->value);
+		bp->value = value;
+		return 0;
+	} else {
+		PyErr_SetString(PyExc_AttributeError, "unknown attribute");
+		return -1;
+	}
+	return 0;
+}
+
 
 /*
  * map characteristics of the base64 edb object 
@@ -284,8 +330,8 @@ PyTypeObject rpcBase64Type = {
 	0,
 	(destructor)rpcBase64Dealloc,
 	0,
-	0,
-	0,
+	(getattrfunc)rpcBase64GetAttr,
+	(setattrfunc)rpcBase64SetAttr,
 	0,
 	(reprfunc)rpcBase64Repr,
 	0,

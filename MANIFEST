@@ -3,6 +3,7 @@
 ./INSTALL
 ./Makefile
 ./README
+./TODO
 ./setup.py
 ./xmlrpc.py
 ./pyxmlrpclib.py
