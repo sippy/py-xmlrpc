@@ -1240,6 +1240,9 @@ parseCall(PyObject *request)
 		Py_DECREF(method);
 		Py_DECREF(params);
 		return NULL;
+	} else if (strncmp("<params/>", cp, 9) == 0) {
+		cp += 9;
+		chompStr(&cp, ep, &lines);
 	}
 	unless (findTag("</methodCall>", &cp, ep, &lines, false)) {
 		Py_DECREF(method);

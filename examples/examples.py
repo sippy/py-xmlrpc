@@ -153,7 +153,18 @@ def exampleError():
 
 def exampleEmptyString():
 	s = """
-	<value>\012   <struct>\012    <member>\012     <name>skey</name>\012     <value>\012      <string>4</string>\012     </value>\012    </member>\012    <member>\012     <name>name</name>\012     <value>\012      <string/>\012     </value>\012    </member>\012    <member>\012     <name>action</name>\012     <value>\012      <string>continue</string>\012     </value>\012    </member>\012   </struct>\012  </value>
+	<value>
+		<struct>
+			<member>
+				<name>blah</name>
+			        <value><string/></value>
+			</member>
+			<member>
+				<name>hello</name>
+			        <value><string>blah de</string></value>
+			</member>
+		</struct>
+	</value>
 	"""
 	print xmlrpc.decode(s)[0]
 
