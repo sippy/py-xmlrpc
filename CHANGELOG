@@ -9,6 +9,11 @@ Public
 - create response example in examples.py
 - create response method in exampleServer in examples.py
 
+Internal
+--------
+Fixed signed/unsigned problem and a 64 bit problem that could lead to weird
+bugs.  Thanks to Marcin Cieslak for the patch.
+
 
 Version 0.8.8.2
 =============
