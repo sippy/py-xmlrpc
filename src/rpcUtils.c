@@ -1900,7 +1900,7 @@ escapeString(PyObject *oldStr)
 		}
 	}
 	/* check if we really need to work on this string */
-	if (oldLen <= newLen) {
+	if (newLen <= oldLen) {
 	    Py_INCREF(oldStr);	/* the calling function expects this to be a new object
 				 * and calls Py_DECREF on it */
 	    return oldStr;	/* avoid extra work because it is not necessary */

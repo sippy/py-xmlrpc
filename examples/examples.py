@@ -27,6 +27,7 @@ def main():
 
 	TESTMAP	= {
 		'authClient'	: exampleAuthClient,
+		'amper'		: exampleAmper,
 		'activeFds'	: exampleActiveFds,
 		'base64'	: exampleBase64,
 		'build'		: exampleBuild,
@@ -62,6 +63,12 @@ def usage():
 	sys.stderr.write('usage: examples.py %s\n' % validKeys)
 
 	sys.exit(1)
+
+
+def exampleAmper():
+	e = xmlrpc.encode('&')
+	print e
+	print xmlrpc.decode(e)[0]
 
 
 def exampleClient():
