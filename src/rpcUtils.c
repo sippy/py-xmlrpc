@@ -874,6 +874,9 @@ decodeArray(char **cp, char *ep, ulong *lines)
 			Py_DECREF(res);
 			return NULL;
 		}
+	} else if (strncmp("<data/>", *cp, 7) == 0) {
+		unless (findTag("<data/>", cp, ep, lines, true))
+			return NULL;
 	}
 	unless (findTag("</array>", cp, ep, lines, true)) {
 		Py_DECREF(res);

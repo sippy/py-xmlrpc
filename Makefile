@@ -7,7 +7,7 @@ SRC		= ./src
 LIB		= .
 
 # python installation
-PYTHON		= 2.2
+PYTHON		= 2.3
 PYTHONDIR	= /usr/lib/python$(PYTHON)
 PYTHONLIB	= $(PYTHONDIR)/site-packages
 PYTHONINC	= /usr/include/python$(PYTHON)
