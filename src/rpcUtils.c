@@ -783,6 +783,7 @@ decodeString(char **cp, char *ep, ulong *lines)
 
 	if ((*cp)[7] == '/') {
 		*cp += strlen("<string/>");
+		chompStr(cp, ep, lines);
 		return PyString_FromString("");
 	} else
 		*cp += strlen("<string>");
