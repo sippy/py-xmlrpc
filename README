@@ -65,6 +65,9 @@ a list of the features that have yet to be incorporated.
 
 * Portable: Source should be compatible on both windows and POSIX
 
+* Compatiblity: pyxmlrpclib.py is a drop in replacement for xmlrpclib.
+To use it, simply change pyxmlrpclib instead of xmlrpclib.
+
 
 
 CONTENTS
