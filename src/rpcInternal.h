@@ -49,6 +49,7 @@
 void		*setPyErr(char *error);
 void		*alloc(uint nBytes);
 void		*ralloc(void *vp, uint nBytes);
+void		rpcLogMsg(int level, char *formp, ...);
 void		rpcLogSrc(int level, rpcSource *srcp, char *formp, ...);
 int		get_errno(void);
 void		set_errno(int num);

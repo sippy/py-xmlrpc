@@ -329,12 +329,7 @@ dispHandleError(rpcSource *srcp)
 			close(srcp->fd);
 			srcp->fd = -1;
 		}
-		if (srcp->desc == NULL)
-			fprintf(rpcLogger, "Error from source <fd %d>:\n",
-				srcp->fd);
-		else
-			fprintf(rpcLogger, "Error from source <%s, fd %d>:\n",
-				srcp->desc, srcp->fd);
+		rpcLogSrc(1, srcp, "Error from source");
 		PyErr_Restore(exc, v, tb);
 	} else if (! res & ONERR_KEEP_WORK) {
 		PyErr_Restore(exc, v, tb);

@@ -250,16 +250,22 @@ encodeValue(strBuff *sp, PyObject *value, uint tabs)
 static strBuff *
 encodeInt(strBuff *sp, PyObject *value)
 {
-	PyObject	*strval;
+	char		buff[256];
+	long		l;
 
-	strval = PyObject_Str(value);
+	if (PyInt_Check(value)) {
+		l = PyInt_AsLong(value);
+	} else {
+		assert(PyLong_Check(value));
+		l = PyLong_AsLong(value);
+	}
+	snprintf(buff, sizeof(buff)-1, "%ld", l);
+	buff[sizeof(buff)-1] = EOS;
 
-	if ((strval == NULL)
-	or  (buffConstant(sp, "<int>") == NULL)
-	or  (buffConcat(sp, PyString_AS_STRING(strval)) == NULL)
+	if ((buffConstant(sp, "<int>") == NULL)
+	or  (buffConcat(sp, buff) == NULL)
 	or  (buffConstant(sp, "</int>") == NULL))
 		return NULL;
-	Py_DECREF(strval);
 
 	return sp;
 }
@@ -592,8 +598,11 @@ decodeInt(char **cp, char *ep, ulong *lines)
 	long	i;
 
 	*cp += strlen("<int>");
-	unless (decodeActLong(cp, ep, &i))
-		return NULL;
+	unless (decodeActLong(cp, ep, &i)) {
+		char errBuff[256]; 
+		sprintf(errBuff, "Illegal integer: %.10s", *cp);
+		return setPyErr(errBuff);
+	}
 	if (*cp >= ep)
 		return eosErr();
 	unless (findTag("</int>", cp, ep, lines, true))
@@ -608,8 +617,11 @@ decodeI4(char **cp, char *ep, ulong *lines)
 	long	i;
 
 	*cp += strlen("<i4>");
-	unless (decodeActLong(cp, ep, &i))
-		return NULL;
+	unless (decodeActLong(cp, ep, &i)) {
+		char errBuff[256];
+		sprintf(errBuff, "Illegal integer: %.10s", *cp);
+		return setPyErr(errBuff);
+	}
 	if (*cp >= ep)
 		return eosErr();
 	unless (findTag("</i4>", cp, ep, lines, true))
