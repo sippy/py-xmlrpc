@@ -22,7 +22,7 @@ SRC	= map(lambda x: 'src/' + x,
 		     os.listdir('src')))
 
 setup(	name		= 'py-xmlrpc',
-	version		= '0.8.8.3',
+	version		= '0.8.8.4b',
 	description	= 'xmlrpc for Python',
 	author		= 'Shilad Sen',
 	author_email	= 'shilad.sen@sourcelight.com',

@@ -80,9 +80,11 @@ class Unmarshaller:
 		s = string.lstrip(self.data)
 		if s[:7] == '<value>':
 			self.value = _xmlrpc.decode(data)
-		elif ((s[:21] == "<?xml version='1.0'?>")
-		or    (s[:21] == '<?xml version="1.0"?>')):
-			s = string.lstrip(s[21:])
+		elif s[:14] == "<?xml version=":
+			i = string.find(s, '?>')
+			if i < 0:
+				raise TypeError, "unrecognized data: %.40s..." % s
+			s = string.lstrip(s[i+2:])
 			if s[:16] == '<methodResponse>':
 				try:
 					s = ("HTTP/1.0 200 OK\r\n"
