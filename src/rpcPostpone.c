@@ -16,6 +16,9 @@
 #include "rpcInternal.h"
 
 
+PyObject	*rpcPostpone = NULL;
+
+
 static PyMethodDef	rpcPostponeMethods[] = {
 	{  NULL,      NULL },
 };

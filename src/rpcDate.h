@@ -12,7 +12,7 @@
 #include "rpcInclude.h"
 
 
-PyTypeObject	rpcDateType;
+extern	PyTypeObject	rpcDateType;
 
 
 /*

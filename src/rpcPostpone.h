@@ -12,7 +12,9 @@
 #include "rpcInclude.h"
 
 
-PyObject	*rpcPostpone;
+extern	PyObject	*rpcPostpone;
+
+
 PyObject 	*rpcPostponeClass(void);
 
 

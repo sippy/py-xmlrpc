@@ -15,7 +15,7 @@
 #include "rpcServer.h"
 
 
-PyTypeObject	rpcClientType;
+extern	PyTypeObject	rpcClientType;
 
 
 

@@ -36,6 +36,13 @@
 #include "rpcInternal.h"
 
 
+int		rpcLogLevel = 3;
+int		rpcDateFormat = XMLRPC_DATE_FORMAT_US;
+PyObject	*rpcError = NULL;
+PyObject	*rpcFaultStr = NULL;
+FILE		*rpcLogger = NULL;
+
+
 void
 xmlrpcInit(void)
 {

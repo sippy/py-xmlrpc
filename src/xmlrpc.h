@@ -57,14 +57,17 @@
 #include "rpcUtils.h"
 
 
-PyObject	*rpcError;
-PyObject	*rpcFaultStr;
-int		rpcLogLevel;
+extern	PyObject	*rpcError;
+extern	PyObject	*rpcFaultStr;
+extern	int		rpcLogLevel;
+extern	int		rpcDateFormat;
+extern	FILE            *rpcLogger;
+
+
 void		xmlrpcInit(void);
 void		setLogLevel(int level);
 void		setLogger(FILE *logger);
-int		rpcDateFormat;
-FILE            *rpcLogger;
+
 
 #ifdef MSWINDOWS
 	void		rpcNTcleanup(void);

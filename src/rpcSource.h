@@ -27,7 +27,7 @@
 #define	ONERR_KEEP_WORK	(1 << 2)
 
 
-PyTypeObject	rpcSourceType;
+extern	PyTypeObject	rpcSourceType;
 
 
 struct _source;			/* to appease the compiler gods */

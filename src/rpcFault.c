@@ -9,6 +9,10 @@
 #include "rpcInternal.h"
 
 
+
+PyObject	*rpcFault = NULL;
+
+
 static PyObject		*rpcFault__init__(PyObject *self, PyObject *args);
 static PyObject		*rpcFault__str__(PyObject *self, PyObject *args);
 static PyMethodDef	rpcFaultMethods[] = {

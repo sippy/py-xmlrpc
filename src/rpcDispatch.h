@@ -14,7 +14,9 @@
 #include "rpcInclude.h"
 
 
-PyTypeObject	rpcDispType;
+extern	PyTypeObject	rpcDispType;
+
+
 struct _disp;				/* to appease the compiler gods */
 
 

@@ -12,7 +12,9 @@
 
 
 #include "rpcInclude.h"
-PyTypeObject	rpcBoolType;
+
+
+extern	PyTypeObject	rpcBoolType;
 
 
 /*

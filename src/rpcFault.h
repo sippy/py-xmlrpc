@@ -12,7 +12,7 @@
 #include "rpcInclude.h"
 
 
-PyObject	*rpcFault;
+extern	PyObject	*rpcFault;
 
 
 PyObject 	*rpcFaultClass(void);

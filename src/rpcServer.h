@@ -15,7 +15,7 @@
 #include "rpcDispatch.h"
 
 
-PyTypeObject	rpcServerType;
+extern	PyTypeObject	rpcServerType;
 
 
 

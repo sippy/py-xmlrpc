@@ -13,7 +13,7 @@
 #include "rpcInclude.h"
 
 
-PyTypeObject	rpcBase64Type;
+extern	PyTypeObject	rpcBase64Type;
 
 
 /*
