@@ -156,6 +156,8 @@ buffAppend(strBuff *sp, char *cp, ulong len)
 	return sp;
 }
 
+/* handy define to avoid useless calls to buffConcat when working with constant strings */
+#define buffConstant(sp, x)	buffAppend(sp, x, sizeof(x)-1)
 
 static strBuff *
 buffRepeat(strBuff *sp, char c, uint reps)
@@ -201,7 +203,7 @@ xmlEncode(PyObject *value)
 static strBuff *
 encodeValue(strBuff *sp, PyObject *value, uint tabs)
 {
-	if (buffConcat(sp, "<value>") == NULL)
+	if (buffConstant(sp, "<value>") == NULL)
 		return NULL;
 	if (PyInt_Check(value) or PyLong_Check(value))
 		sp = encodeInt(sp, value);
@@ -235,7 +237,7 @@ encodeValue(strBuff *sp, PyObject *value, uint tabs)
 	}
 	if (sp == NULL)
 		return NULL;
-	sp = buffConcat(sp, "</value>");
+	sp = buffConstant(sp, "</value>");
 
 	return sp;
 }
@@ -253,9 +255,9 @@ encodeInt(strBuff *sp, PyObject *value)
 	strval = PyObject_Str(value);
 
 	if ((strval == NULL)
-	or  (buffConcat(sp, "<int>") == NULL)
+	or  (buffConstant(sp, "<int>") == NULL)
 	or  (buffConcat(sp, PyString_AS_STRING(strval)) == NULL)
-	or  (buffConcat(sp, "</int>") == NULL))
+	or  (buffConstant(sp, "</int>") == NULL))
 		return NULL;
 	Py_DECREF(strval);
 
@@ -275,9 +277,9 @@ encodeDouble(strBuff *sp, PyObject *value)
 
 	d = PyFloat_AS_DOUBLE(value);
 	snprintf(buff, 255, "%f", d);
-	if ((buffConcat(sp, "<double>") == NULL)
+	if ((buffConstant(sp, "<double>") == NULL)
 	or  (buffConcat(sp, buff) == NULL)
-	or  (buffConcat(sp, "</double>") == NULL))
+	or  (buffConstant(sp, "</double>") == NULL))
 		return NULL;
 
 	return sp;
@@ -290,9 +292,9 @@ static strBuff *
 encodeBool(strBuff *sp, PyObject *value)
 {
 	if (((rpcBool *)value)->value)
-		return buffConcat(sp, "<boolean>1</boolean>");
+		return buffConstant(sp, "<boolean>1</boolean>");
 	else
-		return buffConcat(sp, "<boolean>0</boolean>");
+		return buffConstant(sp, "<boolean>0</boolean>");
 }
 
 
@@ -312,9 +314,9 @@ encodeString(strBuff *sp, PyObject *value)
 	cp = PyString_AS_STRING(escStr);
 	len = PyObject_Length(escStr);
 
-	if ((buffConcat(sp, "<string>") == NULL)
+	if ((buffConstant(sp, "<string>") == NULL)
 	or  (buffAppend(sp, cp, len) == NULL)
-	or  (buffConcat(sp, "</string>") == NULL))
+	or  (buffConstant(sp, "</string>") == NULL))
 		return NULL;
 	Py_DECREF(escStr);
 
@@ -334,9 +336,9 @@ encodeBase64(strBuff *sp, PyObject *value)
 	str = rpcBase64Encode(((rpcBase64 *)value)->value);
 	if (str == NULL)
 		return NULL;
-        if ((buffConcat(sp, "<base64>") == NULL)
+        if ((buffConstant(sp, "<base64>") == NULL)
         or  (buffAppend(sp, str, strlen(str)) == NULL)
-        or  (buffConcat(sp, "</base64>") == NULL)) {
+        or  (buffConstant(sp, "</base64>") == NULL)) {
                 return NULL;
 	}
 	free(str);
@@ -363,7 +365,7 @@ encodeDate(strBuff *sp, PyObject *value)
 
 	PyArg_ParseTuple(((rpcDate *)value)->value, "iiiiii", 
 			&year, &month, &day, &hour, &min, &sec);
-	if (buffConcat(sp, "<dateTime.iso8601>") == NULL)
+	if (buffConstant(sp, "<dateTime.iso8601>") == NULL)
 		return (NULL);
 	if (year < 1000)
 		snprintf(add, 5, "0%d", year);
@@ -383,7 +385,7 @@ encodeDate(strBuff *sp, PyObject *value)
 		snprintf(add, 5, "%d", day);
 	if (buffConcat(sp, add) == NULL)
 		return (NULL);
-	if (buffConcat(sp, "T") == NULL)
+	if (buffConstant(sp, "T") == NULL)
 		return (NULL);
 	if (hour < 10)
 		snprintf(add, 5, "0%d:", hour);
@@ -402,7 +404,7 @@ encodeDate(strBuff *sp, PyObject *value)
 	else
 		snprintf(add, 5, "%d", sec);
 	if (buffConcat(sp, add) == NULL
-	or buffConcat(sp, "</dateTime.iso8601>") == NULL)
+	or buffConstant(sp, "</dateTime.iso8601>") == NULL)
 		return (NULL);
 	return (sp);
 }
@@ -418,13 +420,13 @@ encodeArray(strBuff *sp, PyObject *value, uint tabs)
 	PyObject	*elem;
 	int		i;
 
-	if ((buffConcat(sp, EOL) == NULL)
+	if ((buffConstant(sp, EOL) == NULL)
 	or  (buffRepeat(sp, '\t', tabs + 1) == NULL)
-	or  (buffConcat(sp, "<array>") == NULL)
-	or  (buffConcat(sp, EOL) == NULL)
+	or  (buffConstant(sp, "<array>") == NULL)
+	or  (buffConstant(sp, EOL) == NULL)
 	or  (buffRepeat(sp, '\t', tabs + 2) == NULL)
-	or  (buffConcat(sp, "<data>") == NULL)
-	or  (buffConcat(sp, EOL) == NULL))
+	or  (buffConstant(sp, "<data>") == NULL)
+	or  (buffConstant(sp, EOL) == NULL))
 		return NULL;
 	for (i = 0; i < PyObject_Length(value); ++i) {
 		elem = PySequence_GetItem(value, i);
@@ -433,16 +435,16 @@ encodeArray(strBuff *sp, PyObject *value, uint tabs)
 			return NULL;
 		if  (encodeValue(sp, elem, tabs + 3) == NULL)
 			return NULL;
-		if ((buffConcat(sp, EOL) == NULL))
+		if ((buffConstant(sp, EOL) == NULL))
 			return NULL;
 		Py_DECREF(elem);
 	}
 	if ((buffRepeat(sp, '\t', tabs + 2) == NULL)
-	or  (buffConcat(sp, "</data>") == NULL)
-	or  (buffConcat(sp, EOL) == NULL)
+	or  (buffConstant(sp, "</data>") == NULL)
+	or  (buffConstant(sp, EOL) == NULL)
 	or  (buffRepeat(sp, '\t', tabs + 1) == NULL)
-	or  (buffConcat(sp, "</array>") == NULL)
-	or  (buffConcat(sp, EOL) == NULL)
+	or  (buffConstant(sp, "</array>") == NULL)
+	or  (buffConstant(sp, EOL) == NULL)
 	or  (buffRepeat(sp, '\t', tabs) == NULL))
 		return NULL;
 
@@ -465,10 +467,10 @@ encodeStruct(strBuff *sp, PyObject *value, uint tabs)
 
 	items = PyMapping_Items(value);
 	if ((items == NULL)
-	or  (buffConcat(sp, EOL) == NULL)
+	or  (buffConstant(sp, EOL) == NULL)
 	or  (buffRepeat(sp, '\t', tabs + 1) == NULL)
-	or  (buffConcat(sp, "<struct>") == NULL)
-	or  (buffConcat(sp, EOL) == NULL))
+	or  (buffConstant(sp, "<struct>") == NULL)
+	or  (buffConstant(sp, EOL) == NULL))
 		return NULL;
 	for (i = 0; i < PyObject_Length(items); ++i) {
 		tup = PySequence_GetItem(items, i);
@@ -482,19 +484,19 @@ encodeStruct(strBuff *sp, PyObject *value, uint tabs)
 		}
 		if ((tup == NULL || name == NULL || val == NULL)
 		or  (buffRepeat(sp, '\t', tabs + 2) == NULL)
-		or  (buffConcat(sp, "<member>") == NULL)
-		or  (buffConcat(sp, EOL) == NULL)
+		or  (buffConstant(sp, "<member>") == NULL)
+		or  (buffConstant(sp, EOL) == NULL)
 		or  (buffRepeat(sp, '\t', tabs + 3) == NULL)
-		or  (buffConcat(sp, "<name>") == NULL)
+		or  (buffConstant(sp, "<name>") == NULL)
 		or  (buffConcat(sp, PyString_AS_STRING(name)) == NULL)
-		or  (buffConcat(sp, "</name>") == NULL)
-		or  (buffConcat(sp, EOL) == NULL)
+		or  (buffConstant(sp, "</name>") == NULL)
+		or  (buffConstant(sp, EOL) == NULL)
 		or  (buffRepeat(sp, '\t', tabs + 3) == NULL)
 		or  (encodeValue(sp, val, tabs + 3) == NULL)
-		or  (buffConcat(sp, EOL) == NULL)
+		or  (buffConstant(sp, EOL) == NULL)
 		or  (buffRepeat(sp, '\t', tabs + 2) == NULL)
-		or  (buffConcat(sp, "</member>") == NULL)
-		or  (buffConcat(sp, EOL) == NULL))
+		or  (buffConstant(sp, "</member>") == NULL)
+		or  (buffConstant(sp, EOL) == NULL))
 			return NULL;
 		Py_DECREF(tup);
 		Py_DECREF(name);
@@ -502,8 +504,8 @@ encodeStruct(strBuff *sp, PyObject *value, uint tabs)
 	}
 	Py_DECREF(items);
 	if ((buffRepeat(sp, '\t', tabs + 1) == NULL)
-	or  (buffConcat(sp, "</struct>") == NULL)
-	or  (buffConcat(sp, EOL) == NULL)
+	or  (buffConstant(sp, "</struct>") == NULL)
+	or  (buffConstant(sp, EOL) == NULL)
 	or  (buffRepeat(sp, '\t', tabs) == NULL))
 		return NULL;
 
@@ -956,36 +958,36 @@ buildRequest(char *url, char *method, PyObject *params, PyObject *addInfo)
 	assert(PySequence_Check(params));
 	body = newBuff();
 	if ((body == NULL)
-	or  (buffConcat(body, "<?xml version=\"1.0\"?>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "<methodCall>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t<methodName>") == NULL)
+	or  (buffConstant(body, "<?xml version=\"1.0\"?>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "<methodCall>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t<methodName>") == NULL)
 	or  (buffConcat(body, method) == NULL)
-	or  (buffConcat(body, "</methodName>") == NULL)
-	or  (buffConcat(body, EOL) == NULL))
+	or  (buffConstant(body, "</methodName>") == NULL)
+	or  (buffConstant(body, EOL) == NULL))
 		return NULL;
-	if ((buffConcat(body, "\t<params>") == NULL)
-	or  (buffConcat(body, EOL) == NULL))
+	if ((buffConstant(body, "\t<params>") == NULL)
+	or  (buffConstant(body, EOL) == NULL))
 		return NULL;
 	for (i = 0; i < PyObject_Length(params); ++i) {
 		elem = PySequence_GetItem(params, i);
 		if (elem == NULL)
 			return NULL;
-		if ((buffConcat(body, "\t\t<param>") == NULL)
-		or  (buffConcat(body, EOL) == NULL)
-		or  (buffConcat(body, "\t\t\t") == NULL)
+		if ((buffConstant(body, "\t\t<param>") == NULL)
+		or  (buffConstant(body, EOL) == NULL)
+		or  (buffRepeat(body, '\t', 3) == NULL)
 		or  (encodeValue(body, elem, 3) == NULL)
-		or  (buffConcat(body, EOL) == NULL)
-		or  (buffConcat(body, "\t\t</param>") == NULL)
-		or  (buffConcat(body, EOL) == NULL))
+		or  (buffConstant(body, EOL) == NULL)
+		or  (buffConstant(body, "\t\t</param>") == NULL)
+		or  (buffConstant(body, EOL) == NULL))
 			return NULL;
 		Py_DECREF(elem);
 	}
-	if ((buffConcat(body, "\t</params>") == NULL)
-	or  (buffConcat(body, EOL) == NULL))
+	if ((buffConstant(body, "\t</params>") == NULL)
+	or  (buffConstant(body, EOL) == NULL))
 		return NULL;
-	if (buffConcat(body, "</methodCall>") == NULL)
+	if (buffConstant(body, "</methodCall>") == NULL)
 		return NULL;
 
 	header = buildHeader(TYPE_REQ, url, addInfo, body->len);
@@ -1012,23 +1014,23 @@ buildResponse(PyObject *result, PyObject *addInfo)
 
 	body = newBuff();
 	if ((body == NULL)
-	or  (buffConcat(body, "<?xml version=\"1.0\"?>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "<methodResponse>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t<params>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t\t<param>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t\t\t") == NULL)
+	or  (buffConstant(body, "<?xml version=\"1.0\"?>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "<methodResponse>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t<params>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t\t<param>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffRepeat(body, '\t', 3) == NULL)
 	or  (encodeValue(body, result, 3) == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t\t</param>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t</params>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "</methodResponse>") == NULL)
-	or  (buffConcat(body, EOL) == NULL))
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t\t</param>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t</params>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "</methodResponse>") == NULL)
+	or  (buffConstant(body, EOL) == NULL))
 		return NULL;
 
 	header = buildHeader(TYPE_RESP, NULL, addInfo, body->len);
@@ -1061,18 +1063,18 @@ buildFault(int errCode, char *errStr, PyObject *addInfo)
 		return NULL;
 	body = newBuff();
 	if ((body == NULL)
-	or  (buffConcat(body, "<?xml version=\"1.0\"?>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "<methodResponse>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t<fault>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t\t") == NULL)
+	or  (buffConstant(body, "<?xml version=\"1.0\"?>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "<methodResponse>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t<fault>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffRepeat(body, '\t', 2) == NULL)
 	or  (encodeValue(body, error, 2) == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "\t</fault>") == NULL)
-	or  (buffConcat(body, EOL) == NULL)
-	or  (buffConcat(body, "</methodResponse>") == NULL))
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "\t</fault>") == NULL)
+	or  (buffConstant(body, EOL) == NULL)
+	or  (buffConstant(body, "</methodResponse>") == NULL))
 		return NULL;
 	Py_DECREF(error);
 
@@ -1106,21 +1108,21 @@ buildHeader(int reqType, char *url, PyObject *addInfo, long bodyLen)
 		return NULL;
 	switch (reqType) {
 	case TYPE_REQ:
-		if ((buffConcat(header, "POST ") == NULL)
+		if ((buffConstant(header, "POST ") == NULL)
 		or  (buffConcat(header, url) == NULL)
-		or  (buffConcat(header, " HTTP/1.1") == NULL)
-		or  (buffConcat(header, EOL) == NULL)
-		or  (buffConcat(header, "User-Agent: ") == NULL)
+		or  (buffConstant(header, " HTTP/1.1") == NULL)
+		or  (buffConstant(header, EOL) == NULL)
+		or  (buffConstant(header, "User-Agent: ") == NULL)
 		or  (buffConcat(header, XMLRPC_LIB_STR) == NULL)
-		or  (buffConcat(header, EOL) == NULL))
+		or  (buffConstant(header, EOL) == NULL))
 			return NULL;
 		break;
 	case TYPE_RESP:
-		if ((buffConcat(header, "HTTP/1.1 200 OK") == NULL)
-		or  (buffConcat(header, EOL) == NULL)
-		or  (buffConcat(header, "Server: ") == NULL)
+		if ((buffConstant(header, "HTTP/1.1 200 OK") == NULL)
+		or  (buffConstant(header, EOL) == NULL)
+		or  (buffConstant(header, "Server: ") == NULL)
 		or  (buffConcat(header, XMLRPC_LIB_STR) == NULL)
-		or  (buffConcat(header, EOL) == NULL))
+		or  (buffConstant(header, EOL) == NULL))
 			return NULL;
 		break;
 	}
@@ -1135,9 +1137,9 @@ buildHeader(int reqType, char *url, PyObject *addInfo, long bodyLen)
 		if (not PyString_Check(key) || not PyString_Check(val))
 			return setPyErr("header info keys and values must be strings");
 		if ((buffConcat(header, PyString_AS_STRING(key)) == NULL)
-		or  (buffConcat(header, ": ") == NULL)
+		or  (buffConstant(header, ": ") == NULL)
 		or  (buffConcat(header, PyString_AS_STRING(val)) == NULL)
-		or  (buffConcat(header, EOL) == NULL))
+		or  (buffConstant(header, EOL) == NULL))
 			return NULL;
 		Py_DECREF(tup);
 		Py_DECREF(key);
@@ -1145,10 +1147,10 @@ buildHeader(int reqType, char *url, PyObject *addInfo, long bodyLen)
 	}
 	Py_DECREF(items);
 	sprintf(buffLen, "Content-length: %ld%s", bodyLen, EOL);
-	if ((buffConcat(header, "Content-Type: text/xml") == NULL)
-	or  (buffConcat(header, EOL) == NULL)
+	if ((buffConstant(header, "Content-Type: text/xml") == NULL)
+	or  (buffConstant(header, EOL) == NULL)
 	or  (buffConcat(header, buffLen) == NULL)
-	or  (buffConcat(header, EOL) == NULL))
+	or  (buffConstant(header, EOL) == NULL))
 		return NULL;
 
 	return header;
@@ -1791,14 +1793,15 @@ static PyObject *
 escapeString(PyObject *oldStr)
 {
 	PyObject	*newStr;
-	int		newLen;
+	int		newLen, oldLen;
 	char		*np,
 			*op,
 			*ep;
 
 	assert(PyString_Check(oldStr));
 	newLen = 0;
-	ep = PyString_AS_STRING(oldStr) + PyString_GET_SIZE(oldStr);
+	oldLen = PyString_GET_SIZE(oldStr);
+	ep = PyString_AS_STRING(oldStr) + oldLen;
 	op = PyString_AS_STRING(oldStr);
 	for (; op < ep; ++op) {
 		switch (*op) {
@@ -1813,6 +1816,13 @@ escapeString(PyObject *oldStr)
 			break;
 		}
 	}
+	/* check if we really need to work on this string */
+	if (oldLen <= newLen) {
+	    Py_INCREF(oldStr);	/* the calling function expects this to be a new object
+				 * and calls Py_DECREF on it */
+	    return oldStr;	/* avoid extra work because it is not necessary */
+	}
+	
 	newStr = PyString_FromStringAndSize(NULL, newLen);
 	if (newStr == NULL)
 		return NULL;
