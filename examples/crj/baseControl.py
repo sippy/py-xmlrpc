@@ -67,7 +67,7 @@ class baseControl:
 		return 1
 
 	def _dispatch(self, *args):
-		(cmd, argv)	= (args[2], args[3])
+		(cmd, argv)	= (args[3], args[4])
 		if self.closed:
 			raise 'Access Error', 'Control object has been closed.'
 		return apply(self.fnmap.get(cmd), tuple(argv))
