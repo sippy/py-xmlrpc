@@ -1,66 +1,57 @@
-CC		= gcc
+# Makefile for the _xmlrpc module
+#
+# $Id$
+
+# locations
 SRC		= ./src
 LIB		= .
-DEBUG		= -g
-OPTIMIZE	= -O2
+
+# python installation
 PYTHON		= 1.5
 PYTHONDIR	= /usr/lib/python$(PYTHON)
 PYTHONLIB	= $(PYTHONDIR)/site-packages
 PYTHONINC	= /usr/include/python$(PYTHON)
+
+# compiler things
+CC		= gcc
+DEBUG		= -g
+OPTIMIZE	= -O6 -fomit-frame-pointer
 CCSHARED	= -fPIC
 INCLUDES	= -I. -I$(PYTHONINC)
 GCCWARN		= -Wall -Wstrict-prototypes
 CFLAGS		= $(DEBUG) $(GCCWARN) $(OPTIMIZE) $(INCLUDES) $(CCSHARED)
 LDSHARED	= -shared
 LDLIBS		=
-INSTALL_LIB	= install -m 755
-INSTALL_HEAD	= install -m 644
 
-all:		xmlrpcmodule.so
+# installation
+INSTALL_SO	= install -m 755
+INSTALL_PY	= install -m 644
 
-xmlrpcmodule.so:	$(SRC)/xmlrpcmodule.o $(SRC)/xmlrpc.o \
-		$(SRC)/rpcBase64.o $(SRC)/rpcBoolean.o \
-		$(SRC)/rpcClient.o $(SRC)/rpcDate.o $(SRC)/rpcDispatch.o \
-		$(SRC)/rpcInternal.o $(SRC)/rpcServer.o $(SRC)/rpcSource.o \
-		$(SRC)/rpcUtils.o $(SRC)/rpcFault.o
-		$(CC) $(CFLAGS) $(LDSHARED) -o $(LIB)/_xmlrpcmodule.so \
-		$(SRC)/xmlrpcmodule.o $(SRC)/xmlrpc.o \
-		$(SRC)/rpcBase64.o $(SRC)/rpcBoolean.o $(SRC)/rpcClient.o \
-		$(SRC)/rpcDate.o $(SRC)/rpcDispatch.o $(SRC)/rpcInternal.o \
-		$(SRC)/rpcServer.o $(SRC)/rpcSource.o $(SRC)/rpcUtils.o \
-		$(SRC)/rpcFault.o \
-		$(LDLIBS) 
+# which files we compile
+SOURCES		= xmlrpcmodule xmlrpc rpcBase64 rpcBoolean rpcClient rpcDate \
+		  rpcDispatch rpcInternal rpcServer rpcSource rpcUtils rpcFault
+OBJECTS		= $(addprefix $(SRC)/,$(addsuffix .o,$(SOURCES)))
 
-xmlrpcmodule.o:	$(SRC)/xmlrpc.o
-		$(CC) $(CFLAGS) -o $(SRC)/xmlrpcmodule.o -c $(SRC)/xmlrpcmodule.c
+MODULE		= $(LIB)/_xmlrpcmodule.so
 
-xmlrpc.o:	$(SRC)/rpcBase64.o $(SRC)/rpcBoolean.o \
-		$(SRC)/rpcClient.o $(SRC)/rpcDate.o $(SRC)/rpcDispatch.o \
-		$(SRC)/rpcInternal.o $(SRC)/rpcServer.o $(SRC)/rpcSource.o \
-		$(SRC)/rpcUtils.o $(SRC)/rpcFault.o
-		$(CC) $(CFLAGS) -o $(SRC)/xmlrpc.o $(SRC)/xmlrpc.c
+all:		$(MODULE)
 
-install:
-		cp $(LIB)/_xmlrpcmodule.so $(LIB)/xmlrpc.py $(PYTHONLIB)
-		chown root.root $(PYTHONLIB)/_xmlrpcmodule.so
-		chown root.root $(PYTHONLIB)/xmlrpc.py
-		chmod 644 $(PYTHONLIB)/_xmlrpcmodule.so
-		chmod 644 $(PYTHONLIB)/xmlrpc.py
+$(MODULE): $(OBJECTS)
+	$(CC) $(CFLAGS) $(LDSHARED) -o $@ $(OBJECTS) $(LDLIBS)
 
+install: $(MODULE) xmlrpc.py
+	$(INSTALL_SO) $(MODULE) $(PYTHONLIB)
+	$(INSTALL_PY) xmlrpc.py $(PYTHONLIB)
 
-rpcBase64.o:	$(SRC)/rpcBase64.h
-rpcBoolean.o:	$(SRC)/rpcBoolean.h
-rpcClient.o:	$(SRC)/rpcClient.h
-rpcFault.o:	$(SRC)/rpcFault.h
-rpcDate.o:	$(SRC)/rpcDate.h
-rpcDispatch.o:	$(SRC)/rpcDispatch.h
-rpcInternal.o:	$(SRC)/rpcInternal.h
-rpcServer.o:	$(SRC)/rpcServer.h
-rpcSource.o:	$(SRC)/rpcSource.h
-rpcUtils.o:	$(SRC)/rpcUtils.h
+# compile rule: object with .c source and header
+%.o : %.c %.h Makefile
+	$(CC) $(CFLAGS) -c $< -o $@
+# compile rule: object with .c source and no header
+%.o : %.c Makefile
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-		rm -f $(SRC)/*.o
-		rm -f $(LIB)/*.so
-		rm -f $(LIB)/*.pyc
-		rm -f $(LIB)/*.pyo
+	rm -f $(SRC)/*.o
+	rm -f $(LIB)/*.so
+	rm -f $(LIB)/*.pyc
+	rm -f $(LIB)/*.pyo
