@@ -16,6 +16,9 @@
 
 
 import sys
+
+sys.path.insert(0, '../')
+
 import time
 import thread
 import traceback
@@ -26,7 +29,7 @@ xmlrpc.setLogLevel(0)
 
 
 PORT = 9998
-TIME_WORK = 0.1
+TIME_WORK = 0.001
 TIME_SLEEP = 0.1
 
 

@@ -515,6 +515,18 @@ doResponse(rpcServer *servp, rpcSource *srcp, PyObject *result, bool keepAlive)
 		if (exc == NULL) {
 			return (false);
 		} else if (PyErr_GivenExceptionMatches(v, rpcPostpone)) {
+			PyObject	*o;
+			if (srcp->params == NULL) {
+				srcp->params = Py_BuildValue("(i)", keepAlive);
+				if (srcp->params == NULL)
+					return false;
+			} else {
+				o = Py_BuildValue("(i,O)", keepAlive, srcp->params);
+				if (o == NULL)
+					return false;
+				Py_DECREF(srcp->params);
+				srcp->params = o;
+			}
 			rpcLogSrc(7, srcp, "received postpone request");
 			PyErr_Restore(exc, v, tb);
 			PyErr_Clear();
@@ -1129,14 +1141,36 @@ pyRpcServerQueueResponse(PyObject *self, PyObject *args)
 {
 	rpcServer	*servp;
 	rpcSource	*srcp;
-	PyObject	*result;
+	PyObject	*result,
+			*o;
+	bool		keepAlive;
 
 	servp = (rpcServer *)self;
 	unless (PyArg_ParseTuple(args, "O!O", &rpcSourceType, &srcp, &result))
 		return (NULL);
 	assert(result != NULL);
+	if (!PyTuple_Check(srcp->params))
+		return setPyErr("srcp->params was not a tuple");
+	if (PyTuple_GET_SIZE(srcp->params) == 0)
+		return setPyErr("srcp->params did not have length 1 or 2");
+	if (! PyInt_Check(PyTuple_GET_ITEM(srcp->params, 0)))
+		return setPyErr("srcp->params[0] is not an int");
+
+	if (PyTuple_GET_SIZE(srcp->params) == 1) {
+		keepAlive = PyInt_AsLong(PyTuple_GET_ITEM(srcp->params, 0));
+		Py_DECREF(srcp->params);
+		srcp->params = NULL;
+	} else if (PyTuple_GET_SIZE(srcp->params) != 2) {
+		keepAlive = PyInt_AsLong(PyTuple_GET_ITEM(srcp->params, 0));
+		o = PyTuple_GET_ITEM(srcp->params, 1);
+		Py_INCREF(o);
+		Py_DECREF(srcp->params);
+		srcp->params = o;
+	} else
+		return setPyErr("srcp->params did not have length 1 or 2");
+
 	Py_INCREF(result);
-	if (doResponse(servp, srcp, result, true)) {
+	if (doResponse(servp, srcp, result, keepAlive)) {
 		Py_INCREF(Py_None);
 		return (Py_None);
 	} else
