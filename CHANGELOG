@@ -1,0 +1,125 @@
+Version 0.8.8.2
+=============
+Internal
+--------
+Fixed segfault bug in rpcFaultClass() by removing extra method++.
+
+
+Version 0.8.8.1
+=============
+Internal
+--------
+Diagnosed segfault bug incorrectly as a linking bug.  Hid it instead of
+fixing it.
+
+
+Version 0.8.8
+=============
+
+Public
+------
+- Added support for chunked encoding (thanks to Tommi Virtanen)
+- Added support for US / European date formats (per Jesus's request)
+- Added type objects in xmlrpc.py (per Grahams's request)
+- Added support for type objects (per Grahams's request)
+- Added sane repr and str object representations (per Grahams's request)
+- Added fault object so faultCode and faultString can be extracted when
+errors occur.
+
+Internal
+--------
+- Fixed several segfault problems (Thanks to Troels Hansen)
+- Fixed several minor bugs with error handling (Thanks to Troels Hansen)
+- HTTP headers should not be case sensitive any longer
+- Added patch to catch xmlrpc exceptions
+- Added support for not up-to-spec use of "\n" instead of "\r\n" in
+headers - Note that this is not supported yet in chunked encoding.
+
+
+
+Version 0.8.7
+=============
+
+Public:
+-------
+- added server.setAuth() function
+- added optional name, password args to client.execute() and client.nbExecute()
+
+Internal:
+---------
+- fixed several segfault problems
+
+
+
+Version 0.8.6
+=============
+
+Public:
+-------
+- added xmlrpc.VERSION, xmlrpc.LIBRARY
+- error handlers now take 2 arguments: the error src and the exception
+- added server.close() and client.close()
+- documented onErr() function and added example in examples.py
+
+Internal:
+---------
+- fixed one fd-cleanup race condition
+- fixed description buffer overflow (thanks to Jesus for this)
+- fixed reference counting problem in outside error handlers
+- fixed return values in error handlers
+
+
+
+Version 0.8.5
+=============
+
+Public:
+-------
+- client has activeFds() method
+
+Internal:
+---------
+- Client complains properly if nbExecute gets called while already in the
+middle of a previous call
+
+
+
+Version 0.8.4
+=============
+
+Public:
+-------
+- client() constructor takes 3 args: (host, port, uri).  uri is new & optional.
+- server methods should accept 4 args: (server, src, uri, method, params).  Uri
+is a new addition.
+
+Internal:
+---------
+- If server doesn't send "Content-length" paramater, client complains but
+reads to EOF.
+- Client complains properly about bad HTTP Methods & Versions.
+
+
+
+Version 0.8.3
+=============
+
+Public:
+-------
+- client() constructor takes 2 args: host, port
+- connect() is gone.  Execute wraps up both the old connect() and execute().
+- setKeepAlive() is gone.  Keep alive is automatically negotiated.
+- execute() now takes 2 or 3 args: (method name, params, optional timeout) and
+returns the return value of the function (addInfo was dropped)
+- nbExecute() now takes 3 or 4 args (addInfo was dropped)
+- timeout raises appropriate errors.
+- addSource() callbacks should return 0 or 1.  If the return value is 1, the
+callback is reinstalled.
+
+Internal:
+---------
+- all exported "disp" prefixes changed to "rpcDisp" for uniformity
+- xmlrpc.encode([None]) bug fixed
+- big clean ups in rpcClient.
+- added manditory select() after connect attempt (windows client only).
+
