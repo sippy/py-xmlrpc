@@ -202,7 +202,7 @@ rpcServerBindAndListen(rpcServer *servp, int port, int queue)
 #ifdef MSWINDOWS
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if ((fd == INVALID_SOCKET)
-	or  (ioctlsocket((SOCKET)fd, FIONBIO, &flag) == 0)) {
+	or  (ioctlsocket((SOCKET)fd, FIONBIO, &flag) == SOCKET_ERROR)) {
 		PyErr_SetFromErrno(rpcError);
 		return false;
 	}

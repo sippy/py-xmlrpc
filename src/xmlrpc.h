@@ -37,7 +37,7 @@
 #define _XMLRPC_H_
 
 
-#define	XMLRPC_VER		"0.8.8.2"
+#define	XMLRPC_VER		"0.8.8.3"
 #define	XMLRPC_VER_STR		"py-xmlrpc-" XMLRPC_VER
 #define XMLRPC_LIB_STR		"Sourcelight Technologies " XMLRPC_VER_STR
 
