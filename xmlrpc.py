@@ -273,6 +273,9 @@ class source:
 def setLogLevel(level):
 	_xmlrpc.setLogLevel(level)
 
+def setLogger(file):
+	_xmlrpc.setLogger(file)
+
 def getDateFormat():
 	return _xmlrpc.getDateFormat()
 

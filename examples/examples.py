@@ -12,7 +12,6 @@ import traceback
 import select
 import string
 
-
 PORT		= 23456
 TIMEOUT		= 1.0
 LOGLEVEL	= 3		# this is the default log level
