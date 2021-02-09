@@ -52,7 +52,6 @@ xmlrpcInit(void)
 	rpcLogLevel = 3;
 	rpcLogger = stderr;
 	rpcDateFormat = XMLRPC_DATE_FORMAT_US;
-	rpcBoolType.ob_type = &PyType_Type;
 	rpcDateType.ob_type = &PyType_Type;
 	rpcBase64Type.ob_type = &PyType_Type;
 	rpcClientType.ob_type = &PyType_Type;

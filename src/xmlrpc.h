@@ -45,7 +45,6 @@
 #define	XMLRPC_DATE_FORMAT_EUROPE	2
 
 #include "rpcBase64.h"
-#include "rpcBoolean.h"
 #include "rpcClient.h"
 #include "rpcDate.h"
 #include "rpcDispatch.h"

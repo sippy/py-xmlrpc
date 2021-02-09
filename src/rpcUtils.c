@@ -47,6 +47,7 @@ static	strBuff		*buffRepeat(strBuff *sp, char c, uint reps);
 
 static	strBuff		*encodeValue(strBuff *sp, PyObject *value, uint tabs);
 static	strBuff		*encodeBool(strBuff *sp, PyObject *value);
+static	strBuff		*encodeNone(strBuff *sp);
 static	strBuff		*encodeInt(strBuff *sp, PyObject *value);
 static	strBuff		*encodeDouble(strBuff *sp, PyObject *value);
 static	strBuff		*encodeString(strBuff *sp, PyObject *value);
@@ -63,6 +64,7 @@ static	PyObject	*decodeDouble(char **cp, char *ep, ulong *lines);
 static	PyObject	*decodeString(char **cp, char *ep, ulong *lines);
 static	PyObject	*decodeTaglessString(char **cp, char *ep, ulong *lines);
 static	PyObject	*decodeBool(char **cp, char *ep, ulong *lines);
+static	PyObject	*decodeNone(char **cp, char *ep, ulong *lines);
 static	PyObject	*decodeBase64(char **cp, char *ep, ulong *lines);
 static	PyObject	*decodeArray(char **cp, char *ep, ulong *lines);
 static	PyObject	*decodeStruct(char **cp, char *ep, ulong *lines);
@@ -205,11 +207,13 @@ encodeValue(strBuff *sp, PyObject *value, uint tabs)
 {
 	if (buffConstant(sp, "<value>") == NULL)
 		return NULL;
-	if (PyInt_Check(value) or PyLong_Check(value))
+	if (PyInt_CheckExact(value) or PyLong_Check(value))
 		sp = encodeInt(sp, value);
+	else if (value == Py_None)
+                sp = encodeNone(sp);
 	else if (PyFloat_Check(value))
 		sp = encodeDouble(sp, value);
-	else if (value->ob_type == &rpcBoolType)
+	else if (PyBool_Check(value))
 		sp = encodeBool(sp, value);
 	else if (value->ob_type == &rpcDateType)
 		sp = encodeDate(sp, value);
@@ -292,12 +296,25 @@ encodeDouble(strBuff *sp, PyObject *value)
 }
 
 /*
+ * encode the None as: "<nil/>"
+ */
+static strBuff *
+encodeNone(strBuff *sp)
+{
+	if (buffConstant(sp, "<nil/>") == NULL)
+		return NULL;
+
+	return sp;
+}
+
+/*
+/*
  * encode the boolean true (for example) as: "<boolean>1</boolean>"
  */
 static strBuff *
 encodeBool(strBuff *sp, PyObject *value)
 {
-	if (((rpcBool *)value)->value)
+	if (value == Py_True)
 		return buffConstant(sp, "<boolean>1</boolean>");
 	else
 		return buffConstant(sp, "<boolean>0</boolean>");
@@ -581,6 +598,8 @@ decodeValue(char **cp, char *ep, ulong *lines)
 		res = decodeDate(cp, ep, lines);
 	else if (strncmp(*cp, "<base64>", 8) == 0)
 		res = decodeBase64(cp, ep, lines);
+        else if (strncmp(*cp, "<nil/>", 6) == 0)
+                res = decodeNone(cp, ep, lines);
 	else {		/* it must be a string */
 		*cp = tp;
 		res = decodeTaglessString(cp, ep, lines);
@@ -637,6 +656,20 @@ decodeI4(char **cp, char *ep, ulong *lines)
 
 
 static PyObject *
+decodeNone(char **cp, char *ep, ulong *lines)
+{
+	if (*cp + 6 >= ep)
+		return eosErr();
+	*cp += 6;
+	if (chompStr(cp, ep, lines) >= ep)
+		return eosErr();
+
+        Py_INCREF(Py_None);
+	return Py_None;
+}
+
+
+static PyObject *
 decodeBool(char **cp, char *ep, ulong *lines)
 {
 	PyObject	*res;
@@ -656,7 +689,12 @@ decodeBool(char **cp, char *ep, ulong *lines)
 	if (chompStr(cp, ep, lines) >= ep)
 		return eosErr();
 
-	return rpcBoolNew(value);
+        if (value) {
+            Py_INCREF(Py_True);
+            return Py_True;
+        }
+        Py_INCREF(Py_False);
+        return Py_False;
 }
 
 

@@ -197,7 +197,12 @@ makeXmlrpcBool(PyObject *self, PyObject *args)
 	unless (PyArg_ParseTuple(args, "i", &value))
 		return NULL;
 
-	return rpcBoolNew(value);
+        if (value) {
+            Py_INCREF(Py_True);
+            return Py_True;
+        }
+        Py_INCREF(Py_False);
+        return Py_False;
 }
 
 
