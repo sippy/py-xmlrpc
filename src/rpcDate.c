@@ -75,7 +75,7 @@ xmlrpcDateDealloc(rpcDate *dp)
 	if (dp->value) {
 		Py_DECREF(dp->value);
 	}
-	PyMem_DEL(dp);
+	PyObject_DEL(dp);
 }
 
 

@@ -61,7 +61,7 @@ rpcSourceDealloc(rpcSource *srcp)
 	if (srcp->onErr and srcp->onErrType == ONERR_TYPE_PY) {
 		Py_DECREF((PyObject *)srcp->onErr);
 	}
-	PyMem_DEL(srcp);
+	PyObject_DEL(srcp);
 }
 
 

@@ -239,7 +239,7 @@ rpcBase64Dealloc(rpcBase64 *bp)
 	if (bp->value) {
 		Py_DECREF(bp->value);
 	}
-	PyMem_DEL(bp);
+	PyObject_DEL(bp);
 }
 
 

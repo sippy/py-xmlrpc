@@ -68,7 +68,7 @@ rpcDispDealloc(rpcDisp *dp)
 		rpcDispClear(dp);
 		free(dp->srcs);
 	}
-	PyMem_DEL(dp);
+	PyObject_DEL(dp);
 }
 
 

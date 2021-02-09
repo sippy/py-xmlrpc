@@ -46,7 +46,7 @@ rpcBoolValue(PyObject *obj)
 static void
 rpcBoolDealloc(rpcBool *bp)
 {
-	PyMem_DEL(bp);
+	PyObject_DEL(bp);
 }
 
 
