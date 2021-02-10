@@ -292,7 +292,7 @@ rpcServerSetAuth(rpcServer *sp, PyObject *authFunc)
 static bool
 serveAccept(rpcDisp *dp, rpcSource *sp, int actions, PyObject *servp)
 {
-	int			len,
+	socklen_t		len,
 				res;
 	uint			in;
 	rpcSource		*client;
@@ -623,7 +623,7 @@ dispatch(rpcServer *servp, rpcSource *srcp, PyObject *request, bool *keepAlive)
 	if (rpcLogLevel >= 5) {
 		strReq = PyObject_Repr(params);
 		if (strReq == NULL)
-			return false;
+			return NULL;
 		rpcLogSrc(5, srcp, "server got request ('%s', %s)",
 			PyString_AS_STRING(method), PyString_AS_STRING(strReq));
 		Py_DECREF(strReq);
@@ -668,7 +668,7 @@ dispatch(rpcServer *servp, rpcSource *srcp, PyObject *request, bool *keepAlive)
 	if (rpcLogLevel >= 5) {
 		strRes = PyObject_Str(result);
 		if (strRes == NULL)
-			return false;
+			return NULL;
 		rpcLogSrc(5, srcp, "server responding %s", 
 			PyString_AS_STRING(strRes));
 		Py_DECREF(strRes);

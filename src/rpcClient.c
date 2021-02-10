@@ -146,7 +146,7 @@ rpcClientNewFromDisp(char *host, int port, char *url, rpcDisp *disp)
 	slen = strlen(host) + strlen(":123456") + 1;  /* max desc length */
 	sp->desc = alloc(slen);
 	if (sp->desc == NULL)
-		return false;
+		return NULL;
 	if (port == 80)
 		snprintf(sp->desc, slen, "%s", host);
 	else
@@ -443,9 +443,8 @@ clientConnect(rpcClient *cp)
 static bool
 connecting(rpcClient *cp)
 {
-	int		fd,
-			val,
-			len;
+	int		fd, val;
+	socklen_t	len;
 
 	fd = cp->src->fd;
 	len = sizeof(val);

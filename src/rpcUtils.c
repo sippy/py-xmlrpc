@@ -75,7 +75,7 @@ static	strBuff		*buildHeader(
 				PyObject	*addInfo,
 				long		len
 			);
-static	PyObject	*parseFault(char *cp, char *ep, long lines);
+static	PyObject	*parseFault(char *cp, char *ep, ulong lines);
 static	PyObject	*parseHeader(
 				char	**cpp,
 				char	*ep,
@@ -307,7 +307,6 @@ encodeNone(strBuff *sp)
 	return sp;
 }
 
-/*
 /*
  * encode the boolean true (for example) as: "<boolean>1</boolean>"
  */
@@ -1720,7 +1719,7 @@ parseResponse(PyObject *request)
 
 
 static PyObject *
-parseFault(char *cp, char *ep, long lines)
+parseFault(char *cp, char *ep, ulong lines)
 {
 	PyObject	*errDict,
 			*errStr,
@@ -1873,7 +1872,7 @@ unescapeString(char *bp, char *ep)
 	char		*newStr,
 			*tp;
 	int		remLen;
-	ulong		tmp;
+	long		tmp;
 
 	if (ep == bp)
 		return PyString_FromString("");

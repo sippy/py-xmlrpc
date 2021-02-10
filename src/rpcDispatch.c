@@ -331,7 +331,7 @@ dispHandleError(rpcSource *srcp)
 		}
 		rpcLogSrc(1, srcp, "Error from source");
 		PyErr_Restore(exc, v, tb);
-	} else if (! res & ONERR_KEEP_WORK) {
+	} else if (!(res & ONERR_KEEP_WORK)) {
 		PyErr_Restore(exc, v, tb);
 	} else {
 		Py_XDECREF(exc);
