@@ -48,7 +48,7 @@
 #define	ushort		unsigned short
 
 
-static PyObject		*logFileObj = NULL;
+static FILE		*logFile = NULL;
 
 static PyObject		*pySetLogLevel(PyObject *self, PyObject *args);
 static PyObject		*pySetLogger(PyObject *self, PyObject *args);
@@ -133,24 +133,40 @@ pySetLogLevel(PyObject *self, PyObject *args)
 static PyObject *
 pySetLogger(PyObject *self, PyObject *args)
 {
-	PyObject *object = NULL;
+	int fd = -1;
 	FILE    *file = NULL;
 
-	unless (PyArg_ParseTuple(args, "O!", &PyFile_Type, &object))
-		return NULL;
+	unless (PyArg_ParseTuple(args, "i", &fd))
+		goto e0;
 
-	assert(object != NULL);
-	assert(PyFile_Check(object));
-	if (logFileObj != NULL) {
-		Py_DECREF(logFileObj);
+	unless (fd >= 0) {
+		setPyErr("pySetLogger(): non-negative integer is expected");
+		goto e0;
 	}
-	logFileObj = object;
-	Py_INCREF(logFileObj);
-	file = PyFile_AsFile(object);
-	setLogger(file);
+
+	fd = dup(fd);
+	unless(fd >= 0) {
+		setPyErr(strerror(errno));
+		goto e0;
+	}
+
+	file = fdopen(fd, "a");
+	unless (file) {
+		setPyErr(strerror(errno));
+		goto e0;
+	}
+
+	if (logFile != NULL) {
+		fclose(logFile);
+	}
+	logFile = file;
+	setLogger(logFile);
 
 	Py_INCREF(Py_None);
 	return Py_None;
+
+e0:
+	return NULL;
 }
 
 
