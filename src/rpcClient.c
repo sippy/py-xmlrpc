@@ -213,7 +213,7 @@ execDispatch(rpcDisp *dp, rpcSource *sp, int actions, PyObject *params)
 	unless (PyArg_ParseTuple(params, "OiSOO:execDispatch",
 				&cp, &state, &pyfunc, &funcArgs, &args))
 		return false;
-	assert(cp->ob_type == &rpcClientType);
+	assert(Py_TYPE(cp) == &rpcClientType);
 	assert(cp->execing == true);
 
 	switch (state) {

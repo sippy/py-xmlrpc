@@ -52,11 +52,11 @@ xmlrpcInit(void)
 	rpcLogLevel = 3;
 	rpcLogger = stderr;
 	rpcDateFormat = XMLRPC_DATE_FORMAT_US;
-	rpcDateType.ob_type = &PyType_Type;
-	rpcBase64Type.ob_type = &PyType_Type;
-	rpcClientType.ob_type = &PyType_Type;
-	rpcServerType.ob_type = &PyType_Type;
-	rpcSourceType.ob_type = &PyType_Type;
+	Py_TYPE(&rpcDateType) = &PyType_Type;
+	Py_TYPE(&rpcBase64Type) = &PyType_Type;
+	Py_TYPE(&rpcClientType) = &PyType_Type;
+	Py_TYPE(&rpcServerType) = &PyType_Type;
+	Py_TYPE(&rpcSourceType) = &PyType_Type;
 	rpcError = PyString_FromString("xmlrpc.error");
 	if (rpcError == NULL) {
 		fprintf(rpcLogger, "rpcError is NULL in xmlrpcInit\n");

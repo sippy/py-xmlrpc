@@ -215,9 +215,9 @@ encodeValue(strBuff *sp, PyObject *value, uint tabs)
 		sp = encodeDouble(sp, value);
 	else if (PyBool_Check(value))
 		sp = encodeBool(sp, value);
-	else if (value->ob_type == &rpcDateType)
+	else if (Py_TYPE(value) == &rpcDateType)
 		sp = encodeDate(sp, value);
-	else if (value->ob_type == &rpcBase64Type)
+	else if (Py_TYPE(value) == &rpcBase64Type)
 		sp = encodeBase64(sp, value);
 	else if (PyString_Check(value))
 		sp = encodeString(sp, value);
