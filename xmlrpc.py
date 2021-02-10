@@ -224,7 +224,8 @@ class client:
 		self._o.nbexecute(method, params, self.nbDispatch,
 				(pyfunc, extArgs), name, passw)
 
-	def nbDispatch(self, src, response, (pyfunc, extArgs)):
+	def nbDispatch(self, src, response, fapair):
+		pyfunc, extArgs = fapair
 		pyfunc(self, response, extArgs)
 
 	def work(self, timeout=-1.0):

@@ -59,8 +59,8 @@ class baseControl:
 			return self._dispatch
 		if name == 'link':
 			return self._link
-		raise AttributeError, "'%s' instance has no attribute '%s'" % (
-							self.__class__, name)
+		raise AttributeError("'%s' instance has no attribute '%s'" % (
+							self.__class__, name))
 
 	def _close(self):
 		self.closed	= 1
@@ -69,7 +69,7 @@ class baseControl:
 	def _dispatch(self, *args):
 		(cmd, argv)	= (args[3], args[4])
 		if self.closed:
-			raise 'Access Error', 'Control object has been closed.'
+			raise Exception('Access Error: Control object has been closed.')
 		return apply(self.fnmap.get(cmd), tuple(argv))
 
 	def _link(self, cmdlist, cmduse):

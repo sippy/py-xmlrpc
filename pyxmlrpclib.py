@@ -16,8 +16,6 @@ from xmlrpclib import *
 # override xmlrpclib classes with _xmlrpc alternatives
 #
 Boolean	= _xmlrpc.boolean
-True = Boolean(1)
-False = Boolean(0)
 DateTime = _xmlrpc.dateTime
 Binary = _xmlrpc.base64
 
@@ -97,7 +95,7 @@ class Unmarshaller:
 			elif s[:12] == '<methodCall>':
 				(self.method, self.value) = _xmlrpc.parseCall(self.data)
 		if self.value == None:
-			raise TypeError, "unrecognized data: %.40s..." % s
+			raise TypeError("unrecognized data: %.40s..." % s)
 		return self.value
 
 	def getmethodname(self):
@@ -106,5 +104,5 @@ class Unmarshaller:
 
 if __name__ == "__main__":
 	server = Server('http://localhost:23456')
-	print server
-	print server.echo('blah')
+	print(server)
+	print(server.echo('blah'))

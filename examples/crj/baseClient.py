@@ -53,12 +53,12 @@ class Client:
 		xmlrpc.setLogLevel(LOG_LEVEL)
 		self.cmds	= self.__talk__('getclient')
 		if not self.cmds:
-			raise ClientError, 'could not get command list'
+			raise ClientError('could not get command list')
 
 	def __getattr__(self, fn):
 		if fn not in self.cmds:
-			raise AttributeError, '%s instance has no attribute %s' % (
-						self.__class__, fn)
+			raise AttributeError('%s instance has no attribute %s' % (
+						self.__class__, fn))
 		return (lambda a1=NONE,a2=NONE,a3=NONE,a4=NONE,x=fn,y=self.__talk__:
 				y(x, a1, a2, a3, a4))
 
@@ -69,7 +69,7 @@ class Client:
 	#
 	def kill(self):
 		if not self.client:
-			raise ClientError, ERR_CLOSE
+			raise ClientError(ERR_CLOSE)
 		self.timeout	= 1.0
 		try:	self.__talk__('kill')
 		except:	pass
@@ -94,7 +94,7 @@ class Client:
 	def __talk__(self, command, *args):
 		args	= filter(lambda x,y=NONE: (x is not y), args)
 		if not self.client:
-			raise ClientError, ERR_CLOSE
+			raise ClientError(ERR_CLOSE)
 		try:
 			return self.client.execute(command, args,
 						   timeout=self.timeout)

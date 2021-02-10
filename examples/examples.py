@@ -66,18 +66,18 @@ def usage():
 
 
 def exampleAscii():
-	print xmlrpc.decode('<value><string>&#38;</string></value>')
+	print(xmlrpc.decode('<value><string>&#38;</string></value>'))
 
 	
 def exampleAmper():
 	e = xmlrpc.encode('&')
-	print e
-	print xmlrpc.decode(e)[0]
+	print(e)
+	print(xmlrpc.decode(e)[0])
 
 
 def exampleClient():
 	c = xmlrpc.client('localhost', PORT, '/blah')
-	print c.execute('echo', ['Hello, World!'])
+	print(c.execute('echo', ['Hello, World!']))
 
 
 # all of the "magic" is actually in the "postponeMethod" handler function
@@ -85,7 +85,7 @@ def exampleClient():
 #
 def examplePostpone():
 	c = xmlrpc.client('localhost', PORT, '/blah')
-	print c.execute('postpone', ['Hello, World!'])
+	print(c.execute('postpone', ['Hello, World!']))
 
 
 
@@ -94,7 +94,7 @@ def examplePostpone():
 def exampleFault():
 	try:
 		c = xmlrpc.client('localhost', PORT, '/blah')
-		print c.execute('fault', ['Hello, World!'])
+		print(c.execute('fault', ['Hello, World!']))
 	except xmlrpc.fault:
 		f = sys.exc_value
 		sys.stderr.write('xmlrpc fault occurred:\n')
@@ -106,7 +106,7 @@ def exampleFault():
 
 def exampleAuthClient():
 	c = xmlrpc.client('localhost', PORT, '/blah')
-	print c.execute('echo', ['Hello, World!'], 1.0, TEST_NAME, TEST_PASS)
+	print(c.execute('echo', ['Hello, World!'], 1.0, TEST_NAME, TEST_PASS))
 
 
 # you may uncomment the 'setAuth()' line to use the example
@@ -128,10 +128,10 @@ def exampleServer():
 	while 1:
 		try:
 			s.work()	# you could set a timeout if desired
-		except:
+		except Exception as ex:
 			e = sys.exc_info()
 			if e[0] in (KeyboardInterrupt, SystemExit):
-				raise e[0], e[1], e[2]
+				raise ex
 			traceback.print_exc()
 		if exitFlag:
 			break
@@ -156,10 +156,10 @@ def exampleError():
 	while 1:
 		try:
 			s.work()	# you could set a timeout if desired
-		except:
+		except Exception as ex:
 			e = sys.exc_info()
 			if e[0] in (KeyboardInterrupt, SystemExit):
-				raise e[0], e[1], e[2]
+				raise ex
 			traceback.print_exc()
 
 def exampleEmptyString():
@@ -177,7 +177,7 @@ def exampleEmptyString():
 		</struct>
 	</value>
 	"""
-	print xmlrpc.decode(s)[0]
+	print(xmlrpc.decode(s)[0])
 
 
 def errorHandler(src, exc):
@@ -191,11 +191,11 @@ def errorHandler(src, exc):
 
 
 def faultMethod(serv, src, uri, method, params):
-	raise xmlrpc.fault, (23, 'blah')
+	raise xmlrpc.fault(23, 'blah')
 
 
 def echoMethod(serv, src, uri, method, params):
-	print 'params are', params
+	print('params are', params)
 	return params
 
 
@@ -212,10 +212,10 @@ def echoMethod(serv, src, uri, method, params):
 # This essentially echoes the following command's params to a client
 #
 def postponeMethod(serv, src, uri, method, params):
-	print 'delaying response to %s until postpone called again.' % src
+	print('delaying response to %s until postpone called again.' % src)
 	if postponed:
 		s = postponed[0]
-		print 'queueing delayed response to %s.' % s
+		print('queueing delayed response to %s.' % s)
 		del(postponed[0])
 		serv.queueResponse(s, params)
 	postponed.append(src)
@@ -241,7 +241,7 @@ def exampleActiveFds():
 
 
 def activeFdCall(client, response, i):
-	print 'result is', xmlrpc.parseResponse(response)
+	print('result is', xmlrpc.parseResponse(response))
 	client.nbExecute('echo', ['hello', 'world'], activeFdCall, i + 1)
 	client.work(0.0)
 	if i == 1000:
@@ -249,7 +249,7 @@ def activeFdCall(client, response, i):
 
 
 def errHandler(*l):
-	print 'in err handler', `l`
+	print('in err handler', `l`)
 	return
 
 
@@ -260,13 +260,13 @@ def exampleNbClient():
 
 
 def callback(client, response, extArgs=None):
-	print 'callback got response', `response`
-	print 'result is', xmlrpc.parseResponse(response)
+	print('callback got response', `response`)
+	print('result is', xmlrpc.parseResponse(response))
 
 
 def exampleCallback():
 	src = xmlrpc.source(sys.stdin.fileno())
-	print dir(src)
+	print(dir(src))
 	serv = xmlrpc.server()
 	serv.bindAndListen(2343)
 	src.setCallback(stdinHandler, xmlrpc.ACT_INPUT, serv)
@@ -276,7 +276,7 @@ def exampleCallback():
 
 def stdinHandler(src, action, serv):
 	l = sys.stdin.readline()
-	print 'read', `l`, 'from stdin'
+	print('read', `l`, 'from stdin')
 	if l == 'exit\n':
 		serv.exit()
 		return 0		# remove callback
@@ -286,37 +286,37 @@ def stdinHandler(src, action, serv):
 
 def exampleBuild():
 	request = xmlrpc.buildRequest('/uri', 'method', ['Hello, World!'], {})
-	print 'request is:', `request`
-	print
-	print 'parsed request is',  xmlrpc.parseRequest(request)
-	print
+	print('request is:', `request`)
+	print()
+	print('parsed request is',  xmlrpc.parseRequest(request))
+	print()
 
 	response = xmlrpc.buildResponse(['Hello, World!'], {})
-	print 'response is:', `response`
-	print
-	print 'parsed response is', xmlrpc.parseResponse(response)
-	print
+	print('response is:', `response`)
+	print()
+	print('parsed response is', xmlrpc.parseResponse(response))
+	print()
 
 
 def exampleEncode():
 	r = ['hum', 3242, 'de']
-	print 'object is', r
-	print 'encoded is:\n', xmlrpc.encode(r)
-	print 'decoded is:', xmlrpc.decode(xmlrpc.encode(r))
+	print('object is', r)
+	print('encoded is:\n', xmlrpc.encode(r))
+	print('decoded is:', xmlrpc.decode(xmlrpc.encode(r)))
 
 
 def exampleDate():
 	d = xmlrpc.dateTime(1999, 6, 12, 4, 32, 34)
-	print 'date is', d
-	print 'encoded date is', xmlrpc.encode(d)
-	print 'decoded date is', xmlrpc.decode(xmlrpc.encode(d))
+	print('date is', d)
+	print('encoded date is', xmlrpc.encode(d))
+	print('decoded date is', xmlrpc.decode(xmlrpc.encode(d)))
 
 
 def exampleBase64():
 	b = xmlrpc.base64('Hello, world!')
-	print 'base64 is', b
-	print 'encoded base64 is', xmlrpc.encode(b)
-	print 'decoded base64 is', xmlrpc.decode(xmlrpc.encode(b))
+	print('base64 is', b)
+	print('encoded base64 is', xmlrpc.encode(b))
+	print('decoded base64 is', xmlrpc.decode(xmlrpc.encode(b)))
 
 
 if __name__ == '__main__':
