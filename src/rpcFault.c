@@ -86,7 +86,11 @@ rpcFaultClass(void)
 		func = PyCFunction_New(method, NULL);
 		if (func == NULL)
 			return (NULL);
+#if PY_VERSION_HEX >= 0x03000000
+		meth = PyInstanceMethod_New(func);
+#else
 		meth = PyMethod_New(func, NULL, klass);
+#endif
 		if (meth == NULL)
 			return (NULL);
 		if (PyDict_SetItemString(dict, method->ml_name, meth))
