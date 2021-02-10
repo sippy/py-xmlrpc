@@ -17,9 +17,7 @@ else:
 # I think that there are some unresolved which force me
 # to go in this order...
 #
-SRC	= map(lambda x: 'src/' + x,
-	      filter(lambda x: x[-2:] == '.c',
-		     os.listdir('src')))
+SRC	= ['src/' + x for x in os.listdir('src') if x.endswith('.c')]
 
 setup(	name		= 'py-xmlrpc',
 	version		= '0.8.8.4b',
