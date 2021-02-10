@@ -31,7 +31,7 @@ def main():
 	while 1:
 		try:
 			s.work()
-		except:
+		except Exception not in (KeyboardInterrupt, SystemExit):
 			traceback.print_exc()
 
 
