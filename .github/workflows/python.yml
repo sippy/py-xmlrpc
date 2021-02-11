@@ -27,7 +27,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04]
         python-version: ['2.7']
-        compiler: ['gcc', 'clang', 'gcc-9', 'gcc-10', 'clang-9', 'clang-10']
+        compiler: ['gcc', 'clang']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
