@@ -109,6 +109,34 @@ static PyMethodDef rpcModuleMethods[] = {
 	{  NULL,		 NULL,					0, },
 };
 
+#if PY_MAJOR_VERSION > 2
+struct rpcModuleState {
+	PyObject *error;
+};
+#define GETSTATE(m) ((struct rpcModuleState *)PyModule_GetState(m))
+
+static int rpcModuleTraverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
+}
+
+static int rpcModuleClear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+static struct PyModuleDef rpcModuleDef = {
+	PyModuleDef_HEAD_INIT,
+	"_xmlrpc",
+	NULL,
+	sizeof(struct rpcModuleState),
+	rpcModuleMethods,
+	NULL,
+	rpcModuleTraverse,
+	rpcModuleClear,
+	NULL
+};
+#endif
 
 /*
  * module procedure: set the log level
@@ -487,24 +515,38 @@ rpcParseRequest(PyObject *self, PyObject *args)
 /*
  * module initialization done at load time
  */
+#if PY_MAJOR_VERSION > 2
+#define IFAILED() return NULL
+
+PyObject *
+PyInit__xmlrpc(void)
+#else
+#define IFAILED() exit(1)
+
 void
-init_xmlrpc(void) {
+init_xmlrpc(void)
+#endif
+{
 	PyObject *m, *d;
 
 	xmlrpcInit();
 #ifdef MS_WINDOWS
 	unless (rpcNTinit()) {
 		fprintf(rpcLogger, "rpcNTinit() failed\n");
-		exit(1);
+		IFAILED();
 	}
 #endif
+#if PY_MAJOR_VERSION > 2
+	m = PyModule_Create(&rpcModuleDef);
+#else
 	m = Py_InitModule("_xmlrpc", rpcModuleMethods);
+#endif
 	d = PyModule_GetDict(m);
 	unless(PyModule_AddObject(m, "error", rpcError) == 0 &&
 	    PyModule_AddObject(m, "fault", rpcFault) == 0 &&
 	    PyModule_AddObject(m, "postpone", rpcPostpone) == 0) {
 		fprintf(rpcLogger, "PyModule_AddObject() failed\n");
-		exit(1);
+		IFAILED();
 	}
 
 
@@ -522,8 +564,11 @@ init_xmlrpc(void) {
 	and     (insstr(d, "VERSION",             XMLRPC_VER))
 	and     (insstr(d, "LIBRARY",             XMLRPC_LIB_STR))) {
 		fprintf(rpcLogger, "weird shit happened in module loading\n");
-		exit(1);
+		IFAILED();
 	}
+#if PY_MAJOR_VERSION > 2
+	return m;
+#endif
 }
 
 
