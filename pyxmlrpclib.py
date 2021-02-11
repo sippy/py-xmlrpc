@@ -81,7 +81,7 @@ class Unmarshaller:
 		elif s[:14] == "<?xml version=":
 			i = string.find(s, '?>')
 			if i < 0:
-				raise TypeError, "unrecognized data: %.40s..." % s
+				raise TypeError("unrecognized data: %.40s..." % s)
 			s = string.lstrip(s[i+2:])
 			if s[:16] == '<methodResponse>':
 				try:
