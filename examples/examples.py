@@ -41,6 +41,7 @@ def main():
 		'error'		: exampleError,
 		'nbClient'	: exampleNbClient,
 		'postpone'	: examplePostpone,
+		'requestExit'	: exampleRequestExit,
 		'server'	: exampleServer
 	}
 
@@ -88,7 +89,9 @@ def examplePostpone():
 	c = xmlrpc.client('localhost', PORT, '/blah')
 	print(c.execute('postpone', ['Hello, World!']))
 
-
+def exampleRequestExit():
+	c = xmlrpc.client('localhost', PORT, '/blah')
+	print(c.execute('exit', []))
 
 # shows how to explicitly catch a xmlrpc fault raised by the server
 #
@@ -96,12 +99,14 @@ def exampleFault():
 	try:
 		c = xmlrpc.client('localhost', PORT, '/blah')
 		print(c.execute('fault', ['Hello, World!']))
-	except xmlrpc.fault:
-		f = sys.exc_value
+	except xmlrpc.fault as f:
 		sys.stderr.write('xmlrpc fault occurred:\n')
 		sys.stderr.write('faultCode is: %s\n' % f.faultCode)
 		sys.stderr.write('faultString is: %s\n' % f.faultString)
 		traceback.print_exc()
+		sys.exit(0)
+	else:
+		sys.stderr.write('xmlrpc fault test failed\n')
 		sys.exit(1)
 
 
