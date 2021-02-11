@@ -8,7 +8,7 @@ PYTHON_VER="${PYTHON_VER:-"2.7"}"
 export PYTHONPATH="/usr/local/lib/python${PYTHON_VER}/dist-packages"
 
 nfails=0
-for ex in base64 emptyString build amper date ascii encode
+for ex in base64 emptyString build amper date ascii encode exception
 do
   echo -n "${ex}: "
   res="ok"
