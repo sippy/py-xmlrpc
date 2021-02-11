@@ -493,14 +493,20 @@ init_xmlrpc(void) {
 
 	xmlrpcInit();
 #ifdef MS_WINDOWS
-	unless (rpcNTinit())
-		return;
+	unless (rpcNTinit()) {
+		fprintf(rpcLogger, "rpcNTinit() failed\n");
+		exit(1);
+	}
 #endif
 	m = Py_InitModule("_xmlrpc", rpcModuleMethods);
 	d = PyModule_GetDict(m);
-	PyDict_SetItemString(d, "error", rpcError);
-	PyDict_SetItemString(d, "fault", rpcFault);
-	PyDict_SetItemString(d, "postpone", rpcPostpone);
+	unless(PyModule_AddObject(m, "error", rpcError) == 0 &&
+	    PyModule_AddObject(m, "fault", rpcFault) == 0 &&
+	    PyModule_AddObject(m, "postpone", rpcPostpone) == 0) {
+		fprintf(rpcLogger, "PyModule_AddObject() failed\n");
+		exit(1);
+	}
+
 
 	unless ((insint(d, "ACT_INPUT",           ACT_INPUT))
 	and     (insint(d, "ACT_OUTPUT",          ACT_OUTPUT))
@@ -516,7 +522,7 @@ init_xmlrpc(void) {
 	and     (insstr(d, "VERSION",             XMLRPC_VER))
 	and     (insstr(d, "LIBRARY",             XMLRPC_LIB_STR))) {
 		fprintf(rpcLogger, "weird shit happened in module loading\n");
-		return;
+		exit(1);
 	}
 }
 
