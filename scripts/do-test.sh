@@ -1,6 +1,5 @@
 #!/bin/sh
 
-sudo find / -name xmlrpc -type d
 sudo find / -name xmlrpc.py -type f
 
 set -e
