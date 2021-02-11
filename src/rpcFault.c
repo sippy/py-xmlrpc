@@ -75,7 +75,7 @@ rpcFaultClass(void)
 			*meth;
 	PyMethodDef	*method;
 
-	klass = PyErr_NewException("_xmlrpc.fault", PyExc_Exception, NULL);
+	klass = PyErr_NewException("xmlrpc.fault", PyExc_Exception, NULL);
 	if (klass == NULL)
 		return (NULL);
 	for (method = rpcFaultMethods; method->ml_name != NULL; method++) {
