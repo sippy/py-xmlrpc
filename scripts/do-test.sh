@@ -7,6 +7,8 @@ set -e
 
 PYTHON_CMD="${PYTHON_CMD:-"python"}"
 
+export PYTHONPATH="/usr/local/lib/python2.7/dist-packages"
+
 nfails=0
 for ex in base64 emptyString build amper date ascii encode
 do
