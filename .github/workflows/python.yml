@@ -22,6 +22,7 @@ jobs:
     env:
       CC: ${{ matrix.compiler }}
       PYTHON_CMD: "python${{ matrix.python-version }}"
+      PYTHON_VER: "${{ matrix.python-version }}"
 
     strategy:
       matrix:
@@ -44,5 +45,5 @@ jobs:
           ${PYTHON_CMD} setup.py build
           sudo ${PYTHON_CMD} setup.py install
 
-      - name: script
+      - name: Test
         run: sh -x scripts/do-test.sh
