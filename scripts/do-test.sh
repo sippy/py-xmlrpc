@@ -2,6 +2,8 @@
 
 set -e
 
+sudo find / -name xmlrpc -type d
+
 nfails=0
 for ex in base64 emptyString build amper date ascii encode
 do
