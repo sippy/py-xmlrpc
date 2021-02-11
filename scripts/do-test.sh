@@ -1,9 +1,9 @@
 #!/bin/sh
 
-set -e
-
 sudo find / -name xmlrpc -type d
 sudo find / -name xmlrpc.py -type f
+
+set -e
 
 PYTHON_CMD="${PYTHON_CMD:-"python"}"
 
