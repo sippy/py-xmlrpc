@@ -71,15 +71,11 @@ PyObject *
 rpcFaultClass(void)
 {
 	PyObject	*klass,
-			*dict,
 			*func,
 			*meth;
 	PyMethodDef	*method;
 
-	dict = PyDict_New();
-	if (dict == NULL)
-		return (NULL);
-	klass = PyErr_NewException("xmlrpc.fault", NULL, dict);
+	klass = PyErr_NewException("_xmlrpc.fault", PyExc_Exception, NULL);
 	if (klass == NULL)
 		return (NULL);
 	for (method = rpcFaultMethods; method->ml_name != NULL; method++) {
@@ -93,7 +89,7 @@ rpcFaultClass(void)
 #endif
 		if (meth == NULL)
 			return (NULL);
-		if (PyDict_SetItemString(dict, method->ml_name, meth))
+		if (PyObject_SetAttrString(klass, method->ml_name, meth))
 			return (NULL);
 		Py_DECREF(meth);
 		Py_DECREF(func);
@@ -110,14 +106,14 @@ rpcFault_Extract(PyObject *fault, int *faultCode, char **faultString)
 
 	assert(PyErr_GivenExceptionMatches(fault, rpcFault));
 	pyFaultCode = PyObject_GetAttrString(fault, "faultCode");
-	if (faultCode && PyInt_Check(pyFaultCode))
+	if (pyFaultCode && PyInt_Check(pyFaultCode))
 		*faultCode = (int)PyInt_AS_LONG(pyFaultCode);
 	else {
 		fprintf(rpcLogger, "invalid fault code... default to -1\n");
 		*faultCode = -1;
 	}
 	pyFaultString = PyObject_GetAttrString(fault, "faultString");
-	if (faultString && PyString_Check(pyFaultString)) {
+	if (pyFaultString && PyString_Check(pyFaultString)) {
 		*faultString = alloc(PyString_GET_SIZE(pyFaultString) + 1);
 		if (*faultString == NULL)
 			return false;
