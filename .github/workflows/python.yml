@@ -42,8 +42,8 @@ jobs:
       - name: Build & Install
         run: |
           sudo apt-get install -y strace
-          python setup.py build
-          sudo python setup.py install
+          ${PYTHON_CMD} setup.py build
+          sudo ${PYTHON_CMD} setup.py install
 
       - name: script
         run: sh -x scripts/do-test.sh
