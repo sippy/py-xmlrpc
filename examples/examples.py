@@ -35,6 +35,7 @@ def main():
 		'client'	: exampleClient,
 		'date'		: exampleDate,
 		'encode'	: exampleEncode,
+		'exception'	: exampleException,
 		'fault'		: exampleFault,
 		'emptyString'	: exampleEmptyString,
 		'error'		: exampleError,
@@ -304,6 +305,20 @@ def exampleEncode():
 	print('encoded is:\n', xmlrpc.encode(r))
 	print('decoded is:', xmlrpc.decode(xmlrpc.encode(r)))
 
+def exampleException():
+	try:
+		ex = xmlrpc.fault()
+	except TypeError:
+		pass
+	else:
+		raise Exception('xmlrpc.fault.__init__() is not validated')
+	try:
+		raise xmlrpc.fault(1, 'Panic')
+	except xmlrpc.fault as ex:
+		print('faultCode is: %s' % ex.faultCode)
+		print('faultString is: %s' % ex.faultString)
+		if ex.faultCode != 1 or ex.faultString != 'Panic':
+			raise Exception('xmlrpc.fault does not work')
 
 def exampleDate():
 	d = xmlrpc.dateTime(1999, 6, 12, 4, 32, 34)
