@@ -1497,7 +1497,7 @@ parseHeader(char **cpp, char *ep, ulong *lines, int reqType)
 	char 		*cp,
 			*tp,
 			method[256],
-			error[256];
+			error[512];
 	double		version;
 
 	cp = *cpp;
@@ -1518,7 +1518,7 @@ parseHeader(char **cpp, char *ep, ulong *lines, int reqType)
 		strncpy(method, cp, tp-cp);
 		method[tp-cp] = EOS;		/* get rid of the space */
 		if (strcasecmp(method, "POST") != 0) {
-			snprintf(error, 255, "unsupported HTTP Method: '%s'",
+			snprintf(error, sizeof(error) - 1, "unsupported HTTP Method: '%s'",
 				method);
 			return setPyErr(error);
 		}
