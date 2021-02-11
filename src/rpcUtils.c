@@ -671,11 +671,9 @@ decodeNone(char **cp, char *ep, ulong *lines)
 static PyObject *
 decodeBool(char **cp, char *ep, ulong *lines)
 {
-	PyObject	*res;
 	bool		value;
 
 	value = true;		/* to appease the compiler */
-	res = NULL;		/* to appease the compiler */
 	if (*cp + 20 >= ep)
 		return eosErr();
 	if (strncmp(*cp, "<boolean>1</boolean>", 20) == 0)
@@ -981,7 +979,7 @@ decodeStruct(char **cp, char *ep, ulong *lines)
 				(*lines)++;
 			else if (*cp > ep) {
 				Py_DECREF(res);
-				eosErr();
+				(void)eosErr();
 			}
 			(*cp)++;
 		}
@@ -1618,8 +1616,10 @@ parseHeaderLine(PyObject *addInfo, char **cpp, char *ep, ulong *lines)
 	tp = cp;
 	while (*cp != ':' and cp <= ep)
 		cp++;
-	if (cp > ep)
-		return (bool)eosErr();
+	if (cp > ep) {
+		(void)eosErr();
+		return false;
+	}
 	name = PyString_FromStringAndSize(tp, cp - tp);
 	sp = PyString_AS_STRING(name);
 	tp = sp + PyString_GET_SIZE(name);
@@ -1635,8 +1635,10 @@ parseHeaderLine(PyObject *addInfo, char **cpp, char *ep, ulong *lines)
 	while ((cp <= ep)
 	and    (*cp == '\t' || *cp == ' '))
 		cp++;
-	if (cp > ep)
-		return (bool)eosErr();
+	if (cp > ep) {
+		(void)eosErr();
+		return false;
+	}
 	tp = cp;
 	for (;cp <= ep; ++cp)
 		if (*cp == '\n') {
@@ -1648,8 +1650,10 @@ parseHeaderLine(PyObject *addInfo, char **cpp, char *ep, ulong *lines)
 			cp += 2;
 			break;
 		}
-	if (cp > ep)
-		return (bool)eosErr();
+	if (cp > ep) {
+		(void)eosErr();
+		return false;
+	}
 	if (value == NULL)
 		return false;
 	if (PyDict_SetItem(addInfo, name, value))
