@@ -1181,12 +1181,10 @@ pyRpcServerQueueResponse(PyObject *self, PyObject *args)
 static PyObject *
 pyRpcServerQueueFault(PyObject *self, PyObject *args)
 {
-	rpcServer	*servp;
 	rpcSource	*srcp;
 	PyObject	*faultCode,
 			*faultString;
 
-	servp = (rpcServer *)self;
 	unless (PyArg_ParseTuple(args, "O!OS", &rpcSourceType, &srcp,
 	                         &faultCode, &faultString))
 		return (NULL);
