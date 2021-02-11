@@ -324,25 +324,29 @@ rpcBase64SetAttr(rpcBase64 *bp, char *name, PyObject *value)
 */
 PyTypeObject rpcBase64Type = {
 	PyObject_HEAD_INIT(0)
+#if PY_MAJOR_VERSION < 3
 	0,
-	"rpcBase64",
-	sizeof(rpcBase64),
-	0,
-	(destructor)rpcBase64Dealloc,
-	0,
-	(getattrfunc)rpcBase64GetAttr,
-	(setattrfunc)rpcBase64SetAttr,
-	0,
-	(reprfunc)rpcBase64Repr,
-	0,
-	0,
-	0,
-	0,
-	0,
-	(reprfunc)rpcBase64Str,
-	0,
-	0,
-	0,
-	0,
-	0,
+#endif
+	.tp_name = "rpcBase64",
+	.tp_basicsize = sizeof(rpcBase64),
+	.tp_itemsize = 0,
+	.tp_dealloc = (destructor)rpcBase64Dealloc,
+	.tp_print = NULL,
+	.tp_getattr = (getattrfunc)rpcBase64GetAttr,
+	.tp_setattr = (setattrfunc)rpcBase64SetAttr,
+#if PY_MAJOR_VERSION < 3
+	.tp_compare = NULL,
+#endif
+	.tp_repr = (reprfunc)rpcBase64Repr,
+	.tp_as_number = NULL,
+	.tp_as_sequence = NULL,
+	.tp_as_mapping = NULL,
+	.tp_hash = NULL,
+	.tp_call = NULL,
+	.tp_str = (reprfunc)rpcBase64Str,
+	.tp_getattro = NULL,
+	.tp_setattro = NULL,
+	.tp_as_buffer = NULL,
+	.tp_flags = 0,
+	.tp_doc = NULL
 };

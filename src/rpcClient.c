@@ -1250,25 +1250,29 @@ pyRpcClientGetAttr(rpcClient *cp, char *name)
  */
 PyTypeObject rpcClientType = {
 	PyObject_HEAD_INIT(0)
+#if PY_MAJOR_VERSION < 3
 	0,
-	"rpcClient",
-	sizeof(rpcClient),
-	0,
-	(destructor)rpcClientDealloc,		/* tp_dealloc */
-	0,					/* tp_print */
-	(getattrfunc)pyRpcClientGetAttr,	/* tp_getattr */
-	0,					/* tp_setattr */
-	0,					/* tp_compare */
-	0,					/* tp_repr */
-	0,					/* tp_as_number */
-	0,					/* tp_as_sequence */
-	0,					/* tp_as_mapping */
-	0,					/* tp_hash */
-	0,					/* tp_call */
-	0,					/* tp_str */
-	0,					/* tp_getattro */
-	0,					/* tp_setattro */
-	0,					/* tp_as_buffer */
-	0,					/* tp_xxx4 */
-	0,					/* tp_doc */
+#endif
+	.tp_name = "rpcClient",
+	.tp_basicsize = sizeof(rpcClient),
+	.tp_itemsize = 0,
+	.tp_dealloc = (destructor)rpcClientDealloc,
+	.tp_print = NULL,
+	.tp_getattr = (getattrfunc)pyRpcClientGetAttr,
+	.tp_setattr = NULL,
+#if PY_MAJOR_VERSION < 3
+	.tp_compare = NULL,
+#endif
+	.tp_repr = NULL,
+	.tp_as_number = NULL,
+	.tp_as_sequence = NULL,
+	.tp_as_mapping = NULL,
+	.tp_hash = NULL,
+	.tp_call = NULL,
+	.tp_str = NULL,
+	.tp_getattro = NULL,
+	.tp_setattro = NULL,
+	.tp_as_buffer = NULL,
+	.tp_flags = 0,
+	.tp_doc = NULL
 };

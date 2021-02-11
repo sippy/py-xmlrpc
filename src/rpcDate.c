@@ -22,27 +22,31 @@ static PyObject		*xmlrpcDateGet(PyObject *self, PyObject *args);
 */
 PyTypeObject rpcDateType = {
 	PyObject_HEAD_INIT(0)
+#if PY_MAJOR_VERSION < 3
 	0,
-	"xmlrpcdateTime",
-	sizeof(rpcDate),
-	0,
-	(destructor)xmlrpcDateDealloc,
-	0,
-	(getattrfunc)xmlrpcDateGetAttr,
-	(setattrfunc)xmlrpcDateSetAttr,
-	0,
-	(reprfunc)xmlrpcDateRepr,
-	0,
-	0,
-	0,
-	0,
-	0,
-	(reprfunc)xmlrpcDateStr,
-	0,
-	0,
-	0,
-	0,
-	0,
+#endif
+	.tp_name = "xmlrpcdateTime",
+	.tp_basicsize = sizeof(rpcDate),
+	.tp_itemsize = 0,
+	.tp_dealloc = (destructor)xmlrpcDateDealloc,
+	.tp_print = NULL,
+	.tp_getattr = (getattrfunc)xmlrpcDateGetAttr,
+	.tp_setattr = (setattrfunc)xmlrpcDateSetAttr,
+#if PY_MAJOR_VERSION < 3
+	.tp_compare = NULL,
+#endif
+	.tp_repr = (reprfunc)xmlrpcDateRepr,
+	.tp_as_number = NULL,
+	.tp_as_sequence = NULL,
+	.tp_as_mapping = NULL,
+	.tp_hash = NULL,
+	.tp_call = NULL,
+	.tp_str = (reprfunc)xmlrpcDateStr,
+	.tp_getattro = NULL,
+	.tp_setattro = NULL,
+	.tp_as_buffer = NULL,
+	.tp_flags = 0,
+	.tp_doc = NULL
 };
 
 /*

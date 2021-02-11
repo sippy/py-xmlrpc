@@ -293,25 +293,29 @@ rpcSourceRepr(rpcSource *srcp)
  */
 PyTypeObject rpcSourceType = {
 	PyObject_HEAD_INIT(0)
+#if PY_MAJOR_VERSION < 3
 	0,
-	"rpcSource",
-	sizeof(rpcSource),
-	0,
-	(destructor)rpcSourceDealloc,		/* tp_dealloc */
-	0,					/* tp_print */
-	(getattrfunc)rpcSourceGetAttr,		/* tp_getattr */
-	0,					/* tp_setattr */
-	0,					/* tp_compare */
-	(reprfunc)rpcSourceRepr,		/* tp_repr */
-	0,					/* tp_as_number */
-	0,					/* tp_as_sequence */
-	0,					/* tp_as_mapping */
-	0,					/* tp_hash */
-	0,					/* tp_call */
-	0,					/* tp_str */
-	0,					/* tp_getattro */
-	0,					/* tp_setattro */
-	0,					/* tp_as_buffer */
-	0,					/* tp_xxx4 */
-	0,					/* tp_doc */
+#endif
+	.tp_name = "rpcSource",
+	.tp_basicsize = sizeof(rpcSource),
+	.tp_itemsize = 0,
+	.tp_dealloc = (destructor)rpcSourceDealloc,
+	.tp_print = NULL,
+	.tp_getattr = (getattrfunc)rpcSourceGetAttr,
+	.tp_setattr = NULL,
+#if PY_MAJOR_VERSION < 3
+	.tp_compare = NULL,
+#endif
+	.tp_repr = (reprfunc)rpcSourceRepr,
+	.tp_as_number = NULL,
+	.tp_as_sequence = NULL,
+	.tp_as_mapping = NULL,
+	.tp_hash = NULL,
+	.tp_call = NULL,
+	.tp_str = NULL,
+	.tp_getattro = NULL,
+	.tp_setattro = NULL,
+	.tp_as_buffer = NULL,
+	.tp_flags = 0,
+	.tp_doc = NULL
 };
