@@ -48,8 +48,18 @@
 #define PyString_Concat PyBytes_Concat
 #define PyString_ConcatAndDel PyBytes_ConcatAndDel
 #define _PyString_Resize _PyBytes_Resize
-#define PyObject_Compare(inst, obj) ((inst) == (obj))
-#define Py_FindMethod(x, obj, key) PyObject_GenericGetAttr(obj, PyString_FromString(key))
 #define PyString_Check PyUnicode_Check
+#define PyObject_Compare(inst, obj) ((inst) == (obj))
+
+static inline PyObject *
+Py_FindMethod(PyMethodDef *ml, PyObject *self, const char *name) {
+	for (; ml->ml_name != NULL; ml++) {
+		if (name[0] == ml->ml_name[0] &&
+		    strcmp(name+1, ml->ml_name+1) == 0)
+			return PyCFunction_New(ml, self);
+	}
+	return NULL;
+}
+
 
 #endif /* _XMLRPC2TO3_H_ */
