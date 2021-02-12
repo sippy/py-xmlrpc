@@ -20,7 +20,7 @@ else:
 SRC	= ['src/' + x for x in os.listdir('src') if x.endswith('.c')]
 
 setup(	name		= 'py-turbo_xmlrpc',
-	version		= '0.8.8.4b',
+	version		= '0.9.0b',
 	description	= 'Fast XMLRPC implementation for Python',
 	author		= 'Shilad Sen',
 	author_email	= 'shilad.sen@sourcelight.com',
