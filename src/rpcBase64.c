@@ -323,10 +323,7 @@ rpcBase64SetAttr(rpcBase64 *bp, char *name, PyObject *value)
  * map characteristics of the base64 edb object 
 */
 PyTypeObject rpcBase64Type = {
-	PyObject_HEAD_INIT(0)
-#if PY_MAJOR_VERSION < 3
-	0,
-#endif
+	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "rpcBase64",
 	.tp_basicsize = sizeof(rpcBase64),
 	.tp_itemsize = 0,

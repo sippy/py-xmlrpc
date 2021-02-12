@@ -1249,10 +1249,7 @@ pyRpcClientGetAttr(rpcClient *cp, char *name)
  * map characterstics of a client object
  */
 PyTypeObject rpcClientType = {
-	PyObject_HEAD_INIT(0)
-#if PY_MAJOR_VERSION < 3
-	0,
-#endif
+	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "rpcClient",
 	.tp_basicsize = sizeof(rpcClient),
 	.tp_itemsize = 0,

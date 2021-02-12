@@ -1233,10 +1233,7 @@ pyRpcServerGetAttr(rpcServer *sp, char *name)
  * map characterstics of an edb object
  */
 PyTypeObject rpcServerType = {
-	PyObject_HEAD_INIT(0)
-#if PY_MAJOR_VERSION < 3
-	0,
-#endif
+	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "rpcServer",
 	.tp_basicsize = sizeof(rpcServer),
 	.tp_itemsize = 0,

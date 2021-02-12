@@ -449,10 +449,7 @@ get_time(void)
  * map characterstics of a client object
  */
 PyTypeObject rpcDispType = {
-	PyObject_HEAD_INIT(0)
-#if PY_MAJOR_VERSION < 3
-	0,
-#endif
+	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "rpcDisp",
 	.tp_basicsize = sizeof(rpcDisp),
 	.tp_itemsize = 0,

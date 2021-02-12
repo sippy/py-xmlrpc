@@ -292,10 +292,7 @@ rpcSourceRepr(rpcSource *srcp)
  * map characterstics of an edb object
  */
 PyTypeObject rpcSourceType = {
-	PyObject_HEAD_INIT(0)
-#if PY_MAJOR_VERSION < 3
-	0,
-#endif
+	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "rpcSource",
 	.tp_basicsize = sizeof(rpcSource),
 	.tp_itemsize = 0,

@@ -21,10 +21,7 @@ static PyObject		*xmlrpcDateGet(PyObject *self, PyObject *args);
  * map characteristics of the date edb object 
 */
 PyTypeObject rpcDateType = {
-	PyObject_HEAD_INIT(0)
-#if PY_MAJOR_VERSION < 3
-	0,
-#endif
+	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "xmlrpcdateTime",
 	.tp_basicsize = sizeof(rpcDate),
 	.tp_itemsize = 0,
