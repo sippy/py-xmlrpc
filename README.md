@@ -1,14 +1,11 @@
-============================
-  XMLRPC Python Library
-============================
+# Fast XMLRPC Python Library
 
 This kit contains an implementation of the xmlrpc protocol written in C and
 wrapped up in python.  The spec for the XMLRPC protocol can be found at
 "http://www.xmlrpc.com".
 
 
-AUTHOR
-------
+## AUTHOR
 
 Shilad Sen, Sourcelight Technologies Inc.
 
@@ -23,16 +20,15 @@ Thanks to Chris Jensen for the windows compatability and to Pat Szuta for
 the DateTime and Base64 objects.
 
 
-INSTALLATION
-------------
+## INSTALLATION
 
 See the INSTALL file which should be included with this distribution.
 
 
-INFO
-----
+## INFO
 
-This is version 0.8.8.3 of the xmlrpc library.  There have been some big
+This is version 0.8.8.3 of the turbo_xmlrpc library, based off version
+0.8.8.3 of the py-xmlrpc module from SourceForce.  There have been some big
 changes since earlier versions.  Please see the CHANGELOG for version
 information.
 
@@ -42,8 +38,7 @@ everything better, especially the nonblocking aspects of the server and
 client.
 
 
-FEATURES
---------
+## FEATURES
 
 * Efficiency:  This library seems to be 20x-100x faster than other xmlrpc
 libraries I've tried.  I have benchmarked this library at about 1000 RPC
@@ -70,20 +65,18 @@ To use it, simply change pyxmlrpclib instead of xmlrpclib.
 
 
 
-CONTENTS
---------
+## CONTENTS
 
 README			- this file
 CHANGELOG		- features / fixes
 _xmlrpcmodule.so	- a python module written in C for xmlrpc
-xmlrpc.py		- a python wrapper for the low-level module
+turbo_xmlrpc.py		- a python wrapper for the low-level module
 example.py		- example python code
 
 if you have a source distribution, there will be other files.
 
 
-LICENSE
--------
+## LICENSE
 
 A full copy of the LGPL license is included in the file COPYING.
 
