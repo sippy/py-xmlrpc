@@ -60,9 +60,11 @@ def main():
 def usage():
 	global TESTMAP
 
-	validKeys = map(lambda s: ('[%s]' % s), TESTMAP.keys())
-	validKeys = string.join(validKeys)
-	sys.stderr.write('usage: examples.py %s\n' % validKeys)
+	validKeys = ['[%s]' % (s,) for s in TESTMAP.keys()]
+	sys.stderr.write('usage: examples.py')
+	for k in validKeys:
+		sys.stderr.write(' %s' % (k,))
+	sys.stderr.write('\n')
 
 	sys.exit(1)
 
