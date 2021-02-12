@@ -5,6 +5,12 @@ set -e
 PYTHON_CMD="${PYTHON_CMD:-"python"}"
 PYTHON_VER="${PYTHON_VER:-"2.7"}"
 
+if [ "${PYTHON_VER}" != "2.7" ]
+then
+  echo "Not Yet!"
+  exit 0
+fi
+
 export PYTHONPATH="/usr/local/lib/python${PYTHON_VER}/dist-packages"
 
 nfails=0
