@@ -299,7 +299,7 @@ dateTimeType = type(dateTime(1,1,1,1,1,1))
 # base64 data type; constructor takes binary sting
 #
 base64 = _xmlrpc.base64
-base64Type = type(base64(''))
+base64Type = type(base64(b''))
 
 
 # fault data type
