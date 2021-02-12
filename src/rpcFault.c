@@ -29,7 +29,11 @@ rpcFault__init__(PyObject *self, PyObject *args)
 	PyObject	*faultCode,
 			*faultString;
 
+#if PY_MAJOR_VERSION > 2
+	unless (PyArg_ParseTuple(args, "OOU", &self, &faultCode, &faultString))
+#else
 	unless (PyArg_ParseTuple(args, "OOS", &self, &faultCode, &faultString))
+#endif
 		return (NULL);
 	unless (PyInt_Check(faultCode))
 		return setPyErr("faultCode must be an int");
