@@ -14,7 +14,7 @@
 #define	EOL		"\r\n"
 #define	COM_BEG		"<!-- "
 #define	COM_END		" -->"
-#define	TAG_LEN(t)	(sizeof(t)-1)
+#define	TAG_LEN(t)	(long)(sizeof(t)-1)
 
 
 typedef struct {

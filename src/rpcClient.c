@@ -925,7 +925,7 @@ processChunk(rpcClient *client, PyObject **bodyp, PyObject **chunkp)
 		return RETURN_ERR;
 	}
 	rpcLogSrc(7, client->src, "chunk length is %ld", clen);
-	if ((ep-bp) < (clen+strlen("\r\n"))) {
+	if ((ep-bp) < (long)(clen+strlen("\r\n"))) {
 		Py_INCREF(*bodyp);
 		Py_INCREF(*chunkp);
 		return RETURN_READ_MORE;
