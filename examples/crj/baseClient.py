@@ -12,7 +12,7 @@
 #			args.  BTW - this was not my choice... python's scoping
 #			sucks with lambdas.
 #
-#	Requires: 	xmlrpc
+#	Requires: 	turbo_xmlrpc
 #
 #
 #	Copyright:	LGPL
@@ -23,7 +23,7 @@
 #
 #####################################################################################
 
-import xmlrpc
+import turbo_xmlrpc as xmlrpc
 
 LOG_LEVEL	= 0
 ClientError	= 'ClientError'

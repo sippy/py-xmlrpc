@@ -57,7 +57,7 @@ xmlrpcInit(void)
 	Py_TYPE(&rpcClientType) = &PyType_Type;
 	Py_TYPE(&rpcServerType) = &PyType_Type;
 	Py_TYPE(&rpcSourceType) = &PyType_Type;
-	rpcError = PyString_FromString("xmlrpc.error");
+	rpcError = PyString_FromString("turbo_xmlrpc.error");
 	if (rpcError == NULL) {
 		fprintf(rpcLogger, "rpcError is NULL in xmlrpcInit\n");
 		exit(1);

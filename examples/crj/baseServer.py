@@ -7,7 +7,7 @@
 #			server.  When a command comes in for that controller, is
 #			properly routed to it.
 #
-#	Requires:	xmlrpc
+#	Requires:	turbo_xmlrpc
 #
 #       Copyright:      LGPL
 #       Created:        March 20, 2001
@@ -20,7 +20,7 @@
 import string
 import sys
 
-import xmlrpc
+import turbo_xmlrpc as xmlrpc
 
 USAGE	= '''
 usage:

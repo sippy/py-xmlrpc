@@ -19,14 +19,14 @@ else:
 #
 SRC	= ['src/' + x for x in os.listdir('src') if x.endswith('.c')]
 
-setup(	name		= 'py-xmlrpc',
+setup(	name		= 'py-turbo_xmlrpc',
 	version		= '0.8.8.4b',
-	description	= 'xmlrpc for Python',
+	description	= 'Fast XMLRPC implementation for Python',
 	author		= 'Shilad Sen',
 	author_email	= 'shilad.sen@sourcelight.com',
 	license		= 'GNU Lesser General Public License',
-	url		= "http://sourceforge.net/projects/py-xmlrpc/",
-	py_modules	= ['xmlrpc', 'pyxmlrpclib'],
+	url		= "https://github.com/sippy/py-xmlrpc/",
+	py_modules	= ['turbo_xmlrpc', 'pyxmlrpclib'],
 	ext_modules	= [Extension(
 				'_xmlrpc',
 				SRC,

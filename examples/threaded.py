@@ -1,6 +1,6 @@
 #!/usr/bin/python -O
 #
-# The follow is an example for using threads with py-xmlrpc.
+# The follow is an example for using threads with py-turbo_xmlrpc.
 #
 # The normalPing method should take about 1/10 of a second per processed
 # client request, with a linear degredation relative to the number of
@@ -22,7 +22,7 @@ sys.path.insert(0, '../')
 import time
 import thread
 import traceback
-import xmlrpc
+import turbo_xmlrpc as xmlrpc
 
 
 xmlrpc.setLogLevel(0)

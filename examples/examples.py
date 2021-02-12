@@ -1,13 +1,13 @@
 #!/usr/bin/python -O
 #
-# Examples for the xmlrpc library
+# Examples for the turbo_xmlrpc library
 #
 #
 
 
 import sys
 sys.path.insert(0, '../')
-import xmlrpc
+import turbo_xmlrpc as xmlrpc
 import traceback
 import select
 import string

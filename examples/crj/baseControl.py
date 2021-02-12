@@ -12,7 +12,7 @@
 #			Be carefule of one thing, None is not in the xmlrpc spec,
 #			so xmlrpc does not support the None type. 
 #
-#	Requires:	xmlrpc
+#	Requires:
 #
 #
 #       Copyright:      LGPL

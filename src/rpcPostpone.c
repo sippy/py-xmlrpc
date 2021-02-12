@@ -36,7 +36,7 @@ rpcPostponeClass(void)
 	dict = PyDict_New();
 	if (dict == NULL)
 		return (NULL);
-	klass = PyErr_NewException("xmlrpc.postpone", NULL, dict);
+	klass = PyErr_NewException("turbo_xmlrpc.postpone", NULL, dict);
 	if (klass == NULL)
 		return (NULL);
 	for (method = rpcPostponeMethods; method->ml_name != NULL; method++) {

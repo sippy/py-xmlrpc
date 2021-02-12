@@ -1,7 +1,7 @@
 #!/usr/local/bin/python2.0 -O
 
 import sys
-import xmlrpc
+import turbo_xmlrpc as xmlrpc
 
 if len(sys.argv) != 3:
 	sys.stderr.write('usage: %s host port\n' % sys.argv[0])

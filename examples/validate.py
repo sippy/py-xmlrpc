@@ -7,7 +7,7 @@
 
 import sys
 sys.path.append('..')
-import xmlrpc
+import turbo_xmlrpc as xmlrpc
 import traceback
 
 
