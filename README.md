@@ -67,11 +67,13 @@ To use it, simply change pyxmlrpclib instead of xmlrpclib.
 
 ## CONTENTS
 
+```
 README			- this file
 CHANGELOG		- features / fixes
 _xmlrpcmodule.so	- a python module written in C for xmlrpc
 turbo_xmlrpc.py		- a python wrapper for the low-level module
 example.py		- example python code
+```
 
 if you have a source distribution, there will be other files.
 
