@@ -26,7 +26,7 @@ See the INSTALL file which should be included with this distribution.
 ## INFO
 
 This is version 0.9.0 of the turbo_xmlrpc library, based off version
-0.8.8.4b of the py-xmlrpc module from SourceForce.  There have been some
+0.8.8.4b of the py-xmlrpc module from SourceForge.  There have been some
 big changes since earlier versions.  Please see the CHANGELOG for version
 information.
 
