@@ -29,10 +29,10 @@ PyTypeObject rpcDateType = {
 	.tp_basicsize = sizeof(rpcDate),
 	.tp_itemsize = 0,
 	.tp_dealloc = (destructor)xmlrpcDateDealloc,
-	.tp_print = NULL,
 	.tp_getattr = (getattrfunc)xmlrpcDateGetAttr,
 	.tp_setattr = (setattrfunc)xmlrpcDateSetAttr,
 #if PY_MAJOR_VERSION < 3
+	.tp_print = NULL,
 	.tp_compare = NULL,
 #endif
 	.tp_repr = (reprfunc)xmlrpcDateRepr,

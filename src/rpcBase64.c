@@ -331,10 +331,10 @@ PyTypeObject rpcBase64Type = {
 	.tp_basicsize = sizeof(rpcBase64),
 	.tp_itemsize = 0,
 	.tp_dealloc = (destructor)rpcBase64Dealloc,
-	.tp_print = NULL,
 	.tp_getattr = (getattrfunc)rpcBase64GetAttr,
 	.tp_setattr = (setattrfunc)rpcBase64SetAttr,
 #if PY_MAJOR_VERSION < 3
+	.tp_print = NULL,
 	.tp_compare = NULL,
 #endif
 	.tp_repr = (reprfunc)rpcBase64Repr,

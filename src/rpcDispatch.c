@@ -457,10 +457,10 @@ PyTypeObject rpcDispType = {
 	.tp_basicsize = sizeof(rpcDisp),
 	.tp_itemsize = 0,
 	.tp_dealloc = (destructor)rpcDispDealloc,
-	.tp_print = NULL,
 	.tp_getattr = NULL,
 	.tp_setattr = NULL,
 #if PY_MAJOR_VERSION < 3
+	.tp_print = NULL,
 	.tp_compare = NULL,
 #endif
 	.tp_repr = NULL,

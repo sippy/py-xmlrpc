@@ -300,10 +300,10 @@ PyTypeObject rpcSourceType = {
 	.tp_basicsize = sizeof(rpcSource),
 	.tp_itemsize = 0,
 	.tp_dealloc = (destructor)rpcSourceDealloc,
-	.tp_print = NULL,
 	.tp_getattr = (getattrfunc)rpcSourceGetAttr,
 	.tp_setattr = NULL,
 #if PY_MAJOR_VERSION < 3
+	.tp_print = NULL,
 	.tp_compare = NULL,
 #endif
 	.tp_repr = (reprfunc)rpcSourceRepr,
