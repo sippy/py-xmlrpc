@@ -46,7 +46,7 @@ def main():
 	}
 
 	xmlrpc.setLogLevel(LOGLEVEL)
-	if len(sys.argv) <> 2:
+	if len(sys.argv) != 2:
 		sys.stderr.write('Exactly one example must be specified\n')
 		usage()
 	example = sys.argv[1]
@@ -187,7 +187,7 @@ def exampleEmptyString():
 
 
 def errorHandler(src, exc):
-	sys.stderr.write('source %s got error: ' % `src`)
+	sys.stderr.write('source %s got error: ' % src)
 	traceback.print_exception(exc[0], exc[1], exc[2])
 
 	return xmlrpc.ONERR_KEEP_WORK
@@ -255,7 +255,7 @@ def activeFdCall(client, response, i):
 
 
 def errHandler(*l):
-	print('in err handler', `l`)
+	print('in err handler', l)
 	return
 
 
@@ -266,7 +266,7 @@ def exampleNbClient():
 
 
 def callback(client, response, extArgs=None):
-	print('callback got response', `response`)
+	print('callback got response', response)
 	print('result is', xmlrpc.parseResponse(response))
 
 
@@ -282,7 +282,7 @@ def exampleCallback():
 
 def stdinHandler(src, action, serv):
 	l = sys.stdin.readline()
-	print('read', `l`, 'from stdin')
+	print('read', l, 'from stdin')
 	if l == 'exit\n':
 		serv.exit()
 		return 0		# remove callback
@@ -292,13 +292,13 @@ def stdinHandler(src, action, serv):
 
 def exampleBuild():
 	request = xmlrpc.buildRequest('/uri', 'method', ['Hello, World!'], {})
-	print('request is:', `request`)
+	print('request is:', request)
 	print()
 	print('parsed request is',  xmlrpc.parseRequest(request))
 	print()
 
 	response = xmlrpc.buildResponse(['Hello, World!'], {})
-	print('response is:', `response`)
+	print('response is:', response)
 	print()
 	print('parsed response is', xmlrpc.parseResponse(response))
 	print()
