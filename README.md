@@ -7,9 +7,7 @@ wrapped up in python.  The spec for the XMLRPC protocol can be found at
 
 ## AUTHOR
 
-Shilad Sen, Sourcelight Technologies Inc.
-
-shilad.sen@sourcelight.com
+Shilad Sen, Sourcelight Technologies Inc. <shilad.sen@sourcelight.com>
 
 Sourcelight Technologies, Inc
 906 University Place, Suite B-211
