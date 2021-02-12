@@ -50,7 +50,7 @@ def main():
 		sys.stderr.write('Exactly one example must be specified\n')
 		usage()
 	example = sys.argv[1]
-	if not TESTMAP.has_key(example):
+	if example not in TESTMAP:
 		sys.stderr.write('Unknown example: %s\n' % example)
 		usage()
 

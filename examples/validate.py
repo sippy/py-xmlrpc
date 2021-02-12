@@ -67,7 +67,7 @@ def countTheEntities(server, source, name, args):
 		sums[k] = 0
 	s = args[0]
 	for c in s:
-		if specialChars.has_key(c):
+		if c in specialChars:
 			tag = specialChars[c]
 			sums[tag] = sums[tag] + 1
 	return sums
