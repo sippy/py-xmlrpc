@@ -41,9 +41,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Build & Install
-        run: |
-          ${PYTHON_CMD} setup.py build
-          sudo ${PYTHON_CMD} setup.py install
+        run: sh -x scripts/do-build_install.sh
 
       - name: Test
         run: sh -x scripts/do-test.sh
